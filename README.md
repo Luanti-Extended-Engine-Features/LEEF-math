@@ -1,8 +1,7 @@
 Cirno's Perfect Math Library
 ====
 
-![Build Status](https://github.com/excessive/cpml/actions/workflows/runtest.yml/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/excessive/cpml/badge.svg?branch=master)](https://coveralls.io/github/excessive/cpml?branch=master)
+Adapated for Minetest
 
 Various useful bits of game math. 3D line intersections, ray casting, 2d/3d vectors, 4x4 matrices, quaternions, etc.
 
