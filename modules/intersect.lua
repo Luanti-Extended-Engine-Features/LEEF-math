@@ -1,7 +1,6 @@
 --- Various geometric intersections
 -- @module intersect
 
-local modules     = (...):gsub('%.[^%.]+$', '') .. "."
 local constants   = require(modules .. "constants")
 local mat4        = require(modules .. "mat4")
 local vec3        = require(modules .. "vec3")

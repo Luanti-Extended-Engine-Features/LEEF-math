@@ -32,8 +32,6 @@
                 :@@@@@@@++;;;+#@@@@@@+`
                       .;'+++++;.
 --]]
-local modules = (...) and (...):gsub('%.init$', '') .. ".modules." or ""
-
 local cpml = {
 	_LICENSE = "CPML is distributed under the terms of the MIT license. See LICENSE.md.",
 	_URL = "https://github.com/excessive/cpml",
@@ -58,8 +56,30 @@ local files = {
 	"bound3",
 }
 
+modules = minetest.get_modpath("mtul_math_cpml").."/modules/"
+local old_require = require
+
+local len = #modules
+
+local loaded_modules = {}
+function require(path)
+  if loaded_modules[path] then return loaded_modules[path] end
+  print("             TEST                \n\n\n")
+  local ending = string.gsub(path:sub(len+1), "%.", "/")..".lua"
+  --[[if ending[1] ~= "/" then
+    ending = "/"..ending
+  end]]
+  path = modules..ending
+  print(path)
+  loaded_modules[path] = dofile(path)
+  return loaded_modules[path]
+end
 for _, file in ipairs(files) do
 	cpml[file] = require(modules .. file)
 end
-
-return cpml
+--this may not be a good idea, we'll see.
+for i, v in pairs(cpml) do
+    mtul.math[i] = v
+end
+modules = nil
+require = old_require

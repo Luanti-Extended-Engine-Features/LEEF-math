@@ -1,7 +1,6 @@
 --- A 2 component bounding box.
 -- @module bound2
 
-local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local vec2    = require(modules .. "vec2")
 
 local bound2    = {}
@@ -10,8 +9,8 @@ local bound2_mt = {}
 -- Private constructor.
 local function new(min, max)
 	return setmetatable({
-		min=min, -- min: vec2, minimum value for each component 
-		max=max, -- max: vec2, maximum value for each component 
+		min=min, -- min: vec2, minimum value for each component
+		max=max, -- max: vec2, maximum value for each component
 	}, bound2_mt)
 end
 
@@ -50,7 +49,7 @@ function bound2.clone(a)
 	return new(a.min, a.max)
 end
 
---- Construct a bound covering one or two points 
+--- Construct a bound covering one or two points
 -- @tparam vec2 a Any vector
 -- @tparam vec2 b Any second vector (optional)
 -- @treturn vec2 Minimum bound containing the given points
@@ -78,7 +77,7 @@ function bound2.extend_bound(a, b)
 	return a:extend(b.min):extend(b.max)
 end
 
---- Get size of bounding box as a vector 
+--- Get size of bounding box as a vector
 -- @tparam bound2 a bound
 -- @treturn vec2 Vector spanning min to max points
 function bound2.size(a)

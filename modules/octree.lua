@@ -6,7 +6,6 @@
 --- Octree
 -- @module octree
 
-local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local intersect  = require(modules .. "intersect")
 local mat4       = require(modules .. "mat4")
 local utils      = require(modules .. "utils")
@@ -570,55 +569,6 @@ function OctreeNode:has_any_objects()
 	end
 
 	return false
-end
-
---- Draws node boundaries visually for debugging.
--- @param cube Cube model to draw
--- @param depth Used for recurcive calls to this method
-function OctreeNode:draw_bounds(cube, depth)
-	depth = depth or 0
-	local tint = depth / 7 -- Will eventually get values > 1. Color rounds to 1 automatically
-
-	love.graphics.setColor(tint * 255, 0, (1 - tint) * 255)
-	local m = mat4()
-		:translate(self.center)
-		:scale(vec3(self.adjLength, self.adjLength, self.adjLength))
-
-	love.graphics.updateMatrix("transform", m)
-	love.graphics.setWireframe(true)
-	love.graphics.draw(cube)
-	love.graphics.setWireframe(false)
-
-	for _, child in ipairs(self.children) do
-		child:draw_bounds(cube, depth + 1)
-	end
-
-	love.graphics.setColor(255, 255, 255)
-end
-
---- Draws the bounds of all objects in the tree visually for debugging.
--- @param cube Cube model to draw
--- @param filter a function returning true or false to determine visibility.
-function OctreeNode:draw_objects(cube, filter)
-	local tint = self.baseLength / 20
-	love.graphics.setColor(0, (1 - tint) * 255, tint * 255, 63)
-
-	for _, object in ipairs(self.objects) do
-		if filter and filter(object.data) or not filter then
-			local m = mat4()
-				:translate(object.bounds.center)
-				:scale(object.bounds.size)
-
-			love.graphics.updateMatrix("transform", m)
-			love.graphics.draw(cube)
-		end
-	end
-
-	for _, child in ipairs(self.children) do
-		child:draw_objects(cube, filter)
-	end
-
-	love.graphics.setColor(255, 255, 255)
 end
 
 Node = setmetatable({

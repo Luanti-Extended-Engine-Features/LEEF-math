@@ -1,7 +1,6 @@
 --- A 3-component axis-aligned bounding box.
 -- @module bound3
 
-local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3    = require(modules .. "vec3")
 
 local bound3    = {}
@@ -10,7 +9,7 @@ local bound3_mt = {}
 -- Private constructor.
 local function new(min, max)
 	return setmetatable({
-		min=min, -- min: vec3, minimum value for each component 
+		min=min, -- min: vec3, minimum value for each component
 		max=max  -- max: vec3, maximum value for each component
 	}, bound3_mt)
 end
@@ -50,7 +49,7 @@ function bound3.clone(a)
 	return new(a.min, a.max)
 end
 
---- Construct a bound covering one or two points 
+--- Construct a bound covering one or two points
 -- @tparam vec3 a Any vector
 -- @tparam vec3 b Any second vector (optional)
 -- @treturn vec3 Minimum bound containing the given points
@@ -78,7 +77,7 @@ function bound3.extend_bound(a, b)
 	return a:extend(b.min):extend(b.max)
 end
 
---- Get size of bounding box as a vector 
+--- Get size of bounding box as a vector
 -- @tparam bound3 a bound
 -- @treturn vec3 Vector spanning min to max points
 function bound3.size(a)

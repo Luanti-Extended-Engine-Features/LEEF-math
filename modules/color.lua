@@ -1,7 +1,6 @@
 --- Color utilities
 -- @module color
 
-local modules  = (...):gsub('%.[^%.]+$', '') .. "."
 local constants = require(modules .. "constants")
 local utils    = require(modules .. "utils")
 local precond  = require(modules .. "_private_precond")

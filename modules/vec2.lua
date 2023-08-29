@@ -1,7 +1,6 @@
 --- A 2 component vector.
 -- @module vec2
 
-local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3    = require(modules .. "vec3")
 local precond = require(modules .. "_private_precond")
 local private = require(modules .. "_private_utils")

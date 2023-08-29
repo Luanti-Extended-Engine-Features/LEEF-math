@@ -1,7 +1,6 @@
 --- Mesh utilities
 -- @module mesh
 
-local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3    = require(modules .. "vec3")
 local mesh    = {}
 
