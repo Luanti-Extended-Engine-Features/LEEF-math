@@ -1,5 +1,8 @@
 Cirno's Perfect Math Library
 ====
+WORK NEEDED:
+* Vec3s and Vec2s are not currently adapted for functionality with MT vectors (seperate classes)
+
 
 Adapated for Minetest
 
