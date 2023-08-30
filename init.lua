@@ -75,11 +75,8 @@ function require(path)
   return loaded_modules[path]
 end
 for _, file in ipairs(files) do
-	cpml[file] = require(modules .. file)
+	mtul.math[file] = require(modules .. file)
 end
---this may not be a good idea, we'll see.
-for i, v in pairs(cpml) do
-    mtul.math[i] = v
-end
+
 modules = nil
 require = old_require
