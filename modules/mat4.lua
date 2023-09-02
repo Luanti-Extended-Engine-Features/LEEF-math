@@ -458,9 +458,9 @@ end
 -- @treturn mat4 out
 function mat4.scale(out, a, s)
 	identity(tmp)
-	tmp[1]  = s.x
-	tmp[6]  = s.y
-	tmp[11] = s.z
+	tmp[1]  = s.x or s[1]
+	tmp[6]  = s.y or s[2]
+	tmp[11] = s.z or s[3]
 
 	return out:mul(tmp, a)
 end
@@ -507,9 +507,9 @@ end
 -- @treturn mat4 out
 function mat4.translate(out, a, t)
 	identity(tmp)
-	tmp[13] = t.x
-	tmp[14] = t.y
-	tmp[15] = t.z
+	tmp[13] = t.x or t[1]
+	tmp[14] = t.y or t[2]
+	tmp[15] = t.z or t[3]
 
 	return out:mul(tmp, a)
 end

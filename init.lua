@@ -64,19 +64,18 @@ local len = #modules
 local loaded_modules = {}
 function require(path)
   if loaded_modules[path] then return loaded_modules[path] end
-  print("             TEST                \n\n\n")
   local ending = string.gsub(path:sub(len+1), "%.", "/")..".lua"
   --[[if ending[1] ~= "/" then
     ending = "/"..ending
   end]]
   path = modules..ending
-  print(path)
   loaded_modules[path] = dofile(path)
   return loaded_modules[path]
 end
 for _, file in ipairs(files) do
 	mtul.math[file] = require(modules .. file)
 end
+mtul.loaded_modules.cpml = true
 
 modules = nil
 require = old_require
