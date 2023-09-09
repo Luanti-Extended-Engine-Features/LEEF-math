@@ -57,46 +57,48 @@ local files = {
 }
 
 --initialize some variables
-local modpath = minetest.get_modpath("mtul_math_cpml")
+local modpath = minetest.get_modpath("mtul_cpml")
 local loaded_modules = {}
-local insecure = minetest.request_insecure_environment()
-local old_require = require
+local old_require = require --just in case require is present (aka it's an insecure environment)
+local ie = minetest.request_insecure_environment()
 local old_package_path
+
 --if require isn't present, allow us to load the modules through hackish means
 --there's like 100s of require calls, it'd be insane to replace them. If you're farmiliar with require, the goal should be obvious.
+
 --modules is the path to modules
-if not insecure then
+if not ie then
   --if an insecure environment cannot be loaded, then we basically change how require works temporarily, so modules (which is referenced in all CPML files on require() has to be changed)
   modules = modpath.."/modules/"
 else
   old_package_path = package.path
   --get the real modpath and add it to the package.path string so we can find our modules in require()
-  insecure.package.path =  insecure.package.path .. ";"..string.gsub(modpath, "\\bin\\%.%.", "").."?.lua" --add our path
+  ie.package.path =  ie.package.path .. ";"..string.gsub(modpath, "\\bin\\%.%.", "").."?.lua" --add our path
   modules = ".modules."
 end
 
-function require(path)
-  if not insecure then
-    if loaded_modules[path] then return loaded_modules[path] end
-    local ending = string.gsub(path:sub(#modules+1), "%.", "/")..".lua"
-    --[[if ending[1] ~= "/" then
-      ending = "/"..ending
-    end]]
-    path = modules..ending
-    loaded_modules[path] = dofile(path)
-    return loaded_modules[path]
-  else
-    --if mod security is off we want to check for require() first.
-    return (old_require or insecure.require)(path)
+
+if not ie then
+  function require(path)
+      if loaded_modules[path] then return loaded_modules[path] end
+      local ending = string.gsub(path:sub(#modules+1), "%.", "/")..".lua"
+      --[[if ending[1] ~= "/" then
+        ending = "/"..ending
+      end]]
+      path = modules..ending
+      loaded_modules[path] = dofile(path)
+      return loaded_modules[path]
   end
+else
+  require = ie.require
 end
---print(require, insecure.require)
+--print(require, ie.require)
 
 if type(jit) == "table" and jit.status() then
-  if insecure then
+  if ie then
     if pcall(require, "ffi") then
       minetest.log("verbose", "MTUL-CPML: loaded JIT FFI library. Memory efficiency with FFI enabled.")
-      print("JIT")
+      print("mtul-cpml: JIT FFI loaded successfully.")
     else
       minetest.log("error", "MTUL-CPML:  Failure to load JIT FFI library.")
     end
@@ -107,14 +109,15 @@ else
   minetest.log("verbose", "MTUL-CPML:  JIT not present, skipped attempt to load JIT FFI library for acceleration and memory efficiency")
 end
 
+--load the files
+
 for _, file in ipairs(files) do
-  print(modpath..modules..file)
   mtul.math[file] = require(modules .. file)
 end
 
 --unset all the global shit we had to change for CPML to work properly.
 if old_package_path then
-  insecure.package.path = old_package_path
+  ie.package.path = old_package_path
 end
 modules = nil
 require = old_require
