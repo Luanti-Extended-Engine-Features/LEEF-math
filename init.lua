@@ -64,7 +64,7 @@ local ie = minetest.request_insecure_environment()
 
 --if require isn't present, allow us to load the modules through hackish means
 --there's like 100s of require calls, it'd be insane to replace them. If you're farmiliar with require, the goal should be obvious.
-
+modules = "" --this is just for Busted support, as it'll bitch about "attempt to concat a nil value" otherwise.
 --modules is the path to modules
 local old_package_path
 if not ie then
