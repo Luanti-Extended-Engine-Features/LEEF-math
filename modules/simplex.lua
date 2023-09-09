@@ -29,10 +29,6 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
-if _G.love and _G.love.math then
-	return love.math.noise
-end
-
 -- Bail out with dummy module if FFI is missing.
 local has_ffi, ffi = pcall(require, "ffi")
 if not has_ffi then
