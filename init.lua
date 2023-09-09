@@ -61,12 +61,12 @@ local modpath = minetest.get_modpath("mtul_cpml")
 local loaded_modules = {}
 local old_require = require --just in case require is present (aka it's an insecure environment)
 local ie = minetest.request_insecure_environment()
-local old_package_path
 
 --if require isn't present, allow us to load the modules through hackish means
 --there's like 100s of require calls, it'd be insane to replace them. If you're farmiliar with require, the goal should be obvious.
 
 --modules is the path to modules
+local old_package_path
 if not ie then
   --if an insecure environment cannot be loaded, then we basically change how require works temporarily, so modules (which is referenced in all CPML files on require() has to be changed)
   modules = modpath.."/modules/"
