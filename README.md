@@ -6,19 +6,11 @@ also works if you disable mod security (DANGEROUS, NOT RECCOMENDED).
 
 Various useful bits of game math. 3D line intersections, ray casting, 2d/3d vectors, 4x4 matrices, quaternions, etc.
 
-<<<<<<< HEAD
-(originally) intended to be used with LuaJIT and LÖVE (this is the backbone of LÖVE3D).
-
-
-### TODO:
-* Vec3s and Vec2s are not currently adapted for functionality with MT vectors (seperate classes)
-=======
 This is a fork of CPML (for LÖVE/love3d), it's been ported over the minetest so it can be used in whatever you need it for.
-Documentation can be found here: (link coming soon). 
+Documentation can be found here: (link coming soon).
 
 Documentation must be generated manually when a commit is made, because I haven't set up workflows (and have no idea how to).
 
 ### TODO:
 * Vec3s and Vec2s are not currently adapted for functionality with MT vectors (seperate classes)
 * Figure out how CPML (originally) automatically updated docs, and do it here.
->>>>>>> 3a30000ab4b9085f90674241b68e83565a00e511
