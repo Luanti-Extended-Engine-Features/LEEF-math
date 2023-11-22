@@ -473,13 +473,6 @@ function quat.to_string(a)
 	return string.format("(%+0.3f,%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z, a.w)
 end
 
-
---- Convert a quaternion to an Euler angle
--- @tparam quat a Quaternion to convert
--- @treturn vec3 euler angle in radians
-function quat.to_euler()
-end
-
 quat_mt.__index    = quat
 quat_mt.__tostring = quat.to_string
 
