@@ -57,6 +57,12 @@ local files = {
 }
 
 --initialize some variables
+mtul = mtul or {
+  loaded_modules = {}
+}
+mtul.math = mtul.math or {} --other modules (probably) have not initialized this.
+mtul.loaded_modules.cpml = true
+
 local modpath = minetest.get_modpath("mtul_cpml")
 local loaded_modules = {}
 local old_require = require --just in case require is present (aka it's an insecure environment)
@@ -122,5 +128,3 @@ end
 modules = nil
 require = old_require
 
---tell MTUL-CORE that it's loaded.
-mtul.loaded_modules.cpml = true
