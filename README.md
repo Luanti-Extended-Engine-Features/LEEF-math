@@ -1,6 +1,6 @@
 Cirno's Perfect Math Library
 ====
-### Adapated for Minetest
+### Adapted for Minetest
 For best memory performance: have luaJIT & it's FFI library (this should be built into luaJIT), and add MTUL-CPML to your trusted list (so it can `require()` call the FFI library).
 
 Various useful bits of game math. 3D line intersections, ray casting, 2d/3d vectors, 4x4 matrices, quaternions, etc.
