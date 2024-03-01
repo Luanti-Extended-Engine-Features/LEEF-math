@@ -96,7 +96,29 @@ function quat.from_angle_axis(angle, axis, a3, a4)
 	end
 end
 
---- Create a quaternion from a normal/up vector pair.
+--works in theory... probably.
+--- Create a quaternion from an euler angle
+-- @tparam Vec3 (or xyz table)
+-- @treturn quat out
+function quat.from_euler_rotation(rot)
+	local cr = cos(rot.z*.5)
+	local sr = sin(rot.z*.5)
+
+	local cp = cos(rot.x*.5)
+	local sp = sin(rot.x*.5)
+
+	local cy = cos(rot.y*.5)
+	local sy = sin(rot.y*.5)
+	return quat.new({
+		w = cr * cp * cy + sr * sp * sy,
+		x = sr * cp * cy - cr * sp * sy,
+		y = cr * sp * cy + sr * cp * sy,
+		z = cr * cp * sy - sr * sp * cy
+	})
+end
+
+
+--- Create a quaternion from a normal/up vector pair. (accepts minetest vectors)
 -- @tparam vec3 normal
 -- @tparam vec3 up (optional)
 -- @treturn quat out

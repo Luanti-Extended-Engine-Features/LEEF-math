@@ -651,6 +651,17 @@ function mat4.transpose(out, a)
 	return out
 end
 
+--this probably doesnt work so I'm removing it for now, work is being done.
+--- Decompose into euler angles, assumes xyz are all unit vectors.
+--[[function mat4.decompose_rotation(a)
+	local x, y, z
+	x = math.atan2(a[7], a[11])
+	y = math.atan2(-a[3], sqrt(a[7]^2 + a[11]^2))
+	z = math.atan2(a[2], a[1])
+	return x, y, z
+end]]
+
+
 --- Project a point into screen space
 -- @tparam vec3 obj Object position in world space
 -- @tparam mat4 mvp Projection matrix
