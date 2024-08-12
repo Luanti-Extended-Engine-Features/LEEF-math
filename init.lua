@@ -66,7 +66,9 @@ mtul.loaded_modules.cpml = true
 local modpath = minetest.get_modpath("mtul_cpml")
 local loaded_modules = {}
 local old_require = require --just in case require is present (aka it's an insecure environment)
-local ie = minetest.request_insecure_environment()
+local mapgen_env = not minetest.request_insecure_environment -- if the function is not present we're probably in mapgen env
+local ie = minetest.request_insecure_environment and
+    minetest.request_insecure_environment() -- there's no insecure env in mapgen env
 
 --if require isn't present, allow us to load the modules through hackish means
 --there's like 100s of require calls, it'd be insane to replace them. If you're farmiliar with require, the goal should be obvious.
@@ -108,8 +110,9 @@ if type(jit) == "table" and jit.status() then
     else
       minetest.log("error", "MTUL-CPML:  Failure to load JIT FFI library.")
     end
-  else
-    minetest.log("error", "MTUL-CPML:  insecure environment denied for MTUL-CPML. Add mtul-cpml to your trusted mods for JIT FFI support (memory efficiency & speed boost)")
+  elseif not mapgen_env then
+  -- insecure env is not available in mapgen env, print this warning only if not in mapgen env
+    minetest.log("warning", "MTUL-CPML:  insecure environment denied for MTUL-CPML. Add mtul-cpml to your trusted mods for JIT FFI support (memory efficiency & speed boost)")
   end
 else
   minetest.log("verbose", "MTUL-CPML:  JIT not present, skipped attempt to load JIT FFI library for acceleration and memory efficiency")
