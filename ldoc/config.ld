@@ -1,6 +1,6 @@
-project="CPML"
+project="LEEF Math"
 title="CPML documentation"
-description="A math library with (hopefully) everything you need for 2D/3D games"
+description="The CPML library ported to Luanti and extended."
 format="markdown"
 backtick_references=false
 file = {

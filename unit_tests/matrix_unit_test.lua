@@ -1,4 +1,4 @@
-local mat4 = mtul.math.mat4
+local mat4 = leef.math.mat4
 local matrix_tolerance = .00001
 local function check_matrix_equality(m1,m2)
     for i = 1,16 do
@@ -35,10 +35,10 @@ end
     find_irr_order()
 end]]
 print("================== BEGINNING MATRIX UNIT TESTs =======================")
-local find_rot_order = mtul.math.find_matrix_rotation_order
+local find_rot_order = leef.math.find_matrix_rotation_order
 print("\n checking sanity of tests:")
 local _tempeuler = {(math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4}
-local _testmatrix = mtul.math.mat4.set_rot_zxy(mat4.new(), _tempeuler[1],_tempeuler[2],_tempeuler[3])
+local _testmatrix = leef.math.mat4.set_rot_zxy(mat4.new(), _tempeuler[1],_tempeuler[2],_tempeuler[3])
 print("matrix equality check func is sane:", check_matrix_equality(_testmatrix,_testmatrix))
 print("matrix equality check func tolerance:", matrix_tolerance)
 local ran_ang = math.random()*math.pi*2
@@ -46,11 +46,11 @@ print("santitize_angle is sane:", equals(1.60947655802, santitize_angle(7.892661
 --print("checking irrlicht setRotationRadians")
 --print(find_rot_order(irrlicht_matrix_setRotationRadians).." iterations")
 
-print("\n checking MTUL's luanti and irrlicht matrix rotation orders. Rotation application order is in reverse, these are the literal matrix multiplication order. ")
+print("\n checking LEEF's luanti and irrlicht matrix rotation orders. Rotation application order is in reverse, these are the literal matrix multiplication order. ")
 print("checking rotation matrix `set_rot_luanti_entity`")
-find_rot_order(mtul.math.mat4.set_rot_luanti_entity)
+find_rot_order(leef.math.mat4.set_rot_luanti_entity)
 print("checking `set_rot_irrlicht_bone`")
-find_rot_order(mtul.math.mat4.set_rot_irrlicht_bone)
+find_rot_order(leef.math.mat4.set_rot_irrlicht_bone)
 
 --[[print("check in euler out euler for minetest entitiy matrix rotations")
 local x,y,z =(math.random()-.5)*math.pi*4,(math.random()-.5)*math.pi*4,(math.random()-.5)*math.pi*4
@@ -103,13 +103,13 @@ print()]]
 
 
 
---[[local quat = mtul.math.quat
+--[[local quat = leef.math.quat
 print("\n comparing `euler to matrix` & `euler to quaternion` matrix outputs")
 x,y,z = math.random()*math.pi*2,  math.random()*math.pi*2,  math.random()*math.pi*2
 local mat1 = mat4.set_rot_zxy(mat4.new(), x,y,z)
 local new_quat = quat.new():from_euler_zxy(x,y,z)
 local mat2 = mat4.set_rot_from_quaternion(mat4.new(), new_quat)
---local new_quat = mtul.quat.from_euler_
+--local new_quat = leef.quat.from_euler_
 print(mat1)
 print(mat2)
 print(check_matrix_equality(mat1,mat2))]]

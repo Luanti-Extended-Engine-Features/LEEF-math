@@ -1,7 +1,7 @@
 local cos = math.cos
 local sin = math.sin
-local m = mtul.math
-local mat4 = mtul.math.mat4
+local m = leef.math
+local mat4 = leef.math.mat4
 
 local pitch_ZY = function(a)
     local temp = mat4.new()
@@ -97,7 +97,7 @@ local function make_funcs_human_readable(str)
     return str
 end
 
-function mtul.math.find_matrix_rotation_order(check_func)
+function leef.math.find_matrix_rotation_order(check_func)
     --x,y,z
     local euler = {(math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4}
     local output = check_func(mat4.new(), euler[1],euler[2],euler[3])
@@ -131,17 +131,17 @@ function mtul.math.find_matrix_rotation_order(check_func)
 end
 print("================== BEGINNING LUANTI AND IRRLICHT UNIT TESTs =======================")
 
-local find_rot_order = mtul.math.find_matrix_rotation_order
+local find_rot_order = leef.math.find_matrix_rotation_order
 print("\n checking sanity of tests:")
 local _tempeuler = {(math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4}
-local _testmatrix = mtul.math.mat4.set_rot_zxy(mat4.new(), _tempeuler[1],_tempeuler[2],_tempeuler[3])
+local _testmatrix = leef.math.mat4.set_rot_zxy(mat4.new(), _tempeuler[1],_tempeuler[2],_tempeuler[3])
 print("matrix equality check func is sane:", check_matrix_equality(_testmatrix,_testmatrix))
 print("matrix equality check func tolerance:", matrix_tolerance)
 
 print("\n Checking rotation orders. Rotation application order is in reverse, these are the literal matrix multiplication order. ")
 print("checking rotation matrix `set_rot_luanti_entity`")
-find_rot_order(mtul.math.mat4.set_rot_luanti_entity)
+find_rot_order(leef.math.mat4.set_rot_luanti_entity)
 print("checking `set_rot_irrlicht_bone`")
-find_rot_order(mtul.math.mat4.set_rot_irrlicht_bone)
+find_rot_order(leef.math.mat4.set_rot_irrlicht_bone)
 
 print("================== ENDING LUANTI AND IRRLICHT UNIT TESTs =======================")

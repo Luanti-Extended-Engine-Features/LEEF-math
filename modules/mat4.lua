@@ -949,7 +949,7 @@ end
 local quat_new
 function mat4.to_quaternion(m)
 	--I want to note that for no apparent reason at all the original matrix was transposed here
-	if not quat_new then quat_new = mtul.math.quat.new end
+	if not quat_new then quat_new = leef.math.quat.new end
 	local w = math.sqrt(1 + m[1] + m[6] + m[11]) / 2
 	local q=quat_new(
 		(m[7] - m[10]) /(4 * w),

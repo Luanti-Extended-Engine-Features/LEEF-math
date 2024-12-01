@@ -1,8 +1,8 @@
 
 
-local mat4 = mtul.math.mat4
-local quat = mtul.math.quat
-local vec3 = mtul.math.vec3
+local mat4 = leef.math.mat4
+local quat = leef.math.quat
+local vec3 = leef.math.vec3
 local function check_matrix_equality(m1,m2)
     for i = 1,16 do
         if math.abs(m1[i]-m2[i]) > 0.001 then
@@ -15,7 +15,7 @@ end
 print("================== BEGINNING QUATERNION UNIT TESTs =======================")
 
 --print("\n comparing mul_vec3 and rotate_vec3 with random quat on forward facing unit dir")
---[[local new_quat = mtul.math.quat.from_angle_axis((math.random()-.5)*math.pi*4, mtul.math.vec3.new(math.random(), math.random(), math.random())):normalize()
+--[[local new_quat = leef.math.quat.from_angle_axis((math.random()-.5)*math.pi*4, leef.math.vec3.new(math.random(), math.random(), math.random())):normalize()
 local forward = vec3.new(0,0,1)
 print(new_quat:mul_vec3(forward))
 print(new_quat:rotate_vec3(forward))
@@ -26,8 +26,8 @@ print(new_quat:rotate_vec3(forward))]]
 
 
 
-local new_quat = mtul.math.quat.from_angle_axis((math.random()-.5)*math.pi*4, mtul.math.vec3.new(math.random(), math.random(), math.random())):normalize()
-local to_mat_from_quat = mtul.math.mat4.from_quaternion(new_quat)
+local new_quat = leef.math.quat.from_angle_axis((math.random()-.5)*math.pi*4, leef.math.vec3.new(math.random(), math.random(), math.random())):normalize()
+local to_mat_from_quat = leef.math.mat4.from_quaternion(new_quat)
 local to_mat_from_axis_from_quat = mat4.from_angle_axis(new_quat:to_angle_axis())
 --should tell us that quat to matrix is working fine... trusting the original creators anyway...
 print("\n comparing `quat->matrix` to old `quat->angle_axis->matrix`. Matches:",
