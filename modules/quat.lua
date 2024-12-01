@@ -5,6 +5,8 @@ local constants     = require(modules .. "constants")
 local vec3          = require(modules .. "vec3")
 local precond       = require(modules .. "_private_precond")
 local private       = require(modules .. "_private_utils")
+local utils 		= require(modules .. "utils")
+local mat4    		= require(modules .. "mat4")
 local DOT_THRESHOLD = constants.DOT_THRESHOLD
 local DBL_EPSILON   = constants.DBL_EPSILON
 local acos          = math.acos
@@ -35,10 +37,6 @@ if type(jit) == "table" and jit.status() then
 		new = ffi.typeof("cpml_quat")
 	end
 end
-
--- Statically allocate a temporary variable used in some of our functions.
-local tmp = new()
-local qv, uv, uuv = vec3(), vec3(), vec3()
 
 --- Constants
 -- @table quat
@@ -79,6 +77,10 @@ function quat.new(x, y, z, w)
 	return new(0, 0, 0, 1)
 end
 
+--[[returns the required delta rotation to make a quaternion aim at a point
+function quat.aim_at_point(quat)
+end]]
+
 --- Create a quaternion from an angle/axis pair.
 -- @tparam number angle Angle (in radians)
 -- @param axis/x -- Can be of two types, a vec3 axis, or the x component of that axis
@@ -95,28 +97,6 @@ function quat.from_angle_axis(angle, axis, a3, a4)
 		return quat.from_angle_axis(angle, axis.x, axis.y, axis.z)
 	end
 end
-
---works in theory... probably.
---- Create a quaternion from an euler angle
--- @tparam Vec3 (or xyz table)
--- @treturn quat out
-function quat.from_euler_rotation(rot)
-	local cr = cos(rot.z*.5)
-	local sr = sin(rot.z*.5)
-
-	local cp = cos(rot.x*.5)
-	local sp = sin(rot.x*.5)
-
-	local cy = cos(rot.y*.5)
-	local sy = sin(rot.y*.5)
-	return quat.new({
-		w = cr * cp * cy + sr * sp * sy,
-		x = sr * cp * cy - cr * sp * sy,
-		y = cr * sp * cy + sr * cp * sy,
-		z = cr * cp * sy - sr * sp * cy
-	})
-end
-
 
 --- Create a quaternion from a normal/up vector pair. (accepts minetest vectors)
 -- @tparam vec3 normal
@@ -167,27 +147,47 @@ end
 -- @tparam quat a Left hand operand
 -- @tparam quat b Right hand operand
 -- @treturn quat quaternion equivalent to "apply b, then a"
+local out = {}
 function quat.mul(a, b)
 	return new(
-		a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y,
-		a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z,
-		a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x,
-		a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+		(a.x * b.w) + (a.w * b.x) + (a.y * b.z) - (a.z * b.y),
+		(a.y * b.w) + (a.w * b.y) + (a.z * b.x) - (a.x * b.z),
+		(b.w * a.z) + (b.z * a.w) + (b.y * a.x) - (b.x * a.y),
+		(a.w * b.w) - (a.x * b.x) - (a.y * b.y) - (a.z * b.z)
 	)
 end
 
---- Multiply a quaternion and a vec3.
+-- Statically allocate a temporary variable used in some of our functions.
+local tmp = new()
+local u, uv, uuv = vec3(), vec3(), vec3()
+
+--- Multiply a quaternion and a vec3. Equivalent to rotating the vector (a) by the quaternion (v)
 -- @tparam quat a Left hand operand
--- @tparam vec3 b Right hand operand
+-- @tparam vec3 v Right hand operand
 -- @treturn vec3 out
-function quat.mul_vec3(a, b)
-	qv.x = a.x
-	qv.y = a.y
-	qv.z = a.z
-	uv   = qv:cross(b)
-	uuv  = qv:cross(uv)
-	return b + ((uv * a.w) + uuv) * 2
+function quat.mul_vec3(a, v)
+	u.x = a.x
+	u.y = a.y
+	u.z = a.z
+	uv   = u:cross(v)
+	uuv  = u:cross(uv)
+	return v + ((uv * a.w) + uuv) * 2
 end
+
+--[[ does the same thing as above, which I did not know when i reimplemented it to check.
+function quat.rotate_vec3(a, v)
+	u.x = a.x
+	u.y = a.y
+	u.z = a.z
+	local s = a.w
+    return
+
+	(u*u:dot(v)*2)  +
+
+	(v*(s*s - u:dot(u)))  +
+
+	(u:cross(v)*s*2)
+end]]
 
 --- Raise a normalized quaternion to a scalar power.
 -- @tparam quat a Left hand operand (should be a unit quaternion)
@@ -253,7 +253,7 @@ function quat.scale(a, s)
 	)
 end
 
---- Alias of from_angle_axis.
+--- Alias of `from_angle_axis.`
 -- @tparam number angle Angle (in radians)
 -- @param axis/x -- Can be of two types, a vec3 axis, or the x component of that axis
 -- @param y axis -- y component of axis (optional, only if x component param used)
@@ -445,41 +445,176 @@ function quat.to_angle_axis(a, identityAxis)
 	return angle, vec3(x, y, z)
 end
 
---- Convert a quaternion into euler angle components
--- @tparam quat a Quaternion to convert
--- @treturn roll
--- @treturn pitch
--- @treturn yaw
---no idea if this shit really works, very well could not...
-function quat.to_euler_angles_unpack(q)
-    -- roll (x-axis rotation)
-    local sinr_cosp = 2 * (q.w * q.x + q.y * q.z)
-    local cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y)
-    local pitch = math.atan2(sinr_cosp, cosr_cosp)
-
-    -- pitch (y-axis rotation)
-    local sinp = 2 * (q.w * q.y - q.z * q.x)
-    local yaw
-    if math.abs(sinp) >= 1 then
-        yaw = math.pi / 2 * ((sinp > 0) and 1 or -1) -- Use 90 degrees if out of range
-    else
-        yaw = math.asin(sinp)
-    end
-
-    -- yaw (z-axis rotation)
-    local siny_cosp = 2 * (q.w * q.z + q.x * q.y)
-    local cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
-    local roll = math.atan2(siny_cosp, cosy_cosp)
-
-    return pitch, yaw, roll
+--- set a matrix's rotation fields from a quaternion. Uses mat4.set_rot_from_quaternion
+-- @tparam quat quaternion to convert
+-- @tparam mat4 the mat4 to apply to.
+-- @treturn mat4
+function quat.set_matrix_rot(q, m)
+	m:set_rot_from_quaternion(q)
+	return m
 end
 
---- Convert a quaternion into euler angles
--- @tparam quat a Quaternion to convert
--- @treturn result a {roll, pitch, yaw} table
-function quat.to_euler_angles(a)
-	return {quat.to_euler_angles_unpack(a)}
+--- create a new quaternion from a matrix. Uses mat4.to_quaternion
+-- @tparam mat4 the matrix to use
+-- @treturn quat
+function quat.from_matrix(m)
+	return m:to_quaternion()
 end
+
+
+
+--- convert a quaternion to an ZXY euler angles. This is the rotation order used by Minetest/Luanti Entities.
+-- @tparam quat quaternion to convert
+-- @treturn float X
+-- @treturn float Y
+-- @treturn float Z
+local atan2 = math.atan2
+local abs = math.abs
+local asin = math.asin
+function quat.get_euler_zxy(q)
+	local qx, qy, qz, qw = q.x, q.y, q.z, q.w
+	local s = 1/sqrt(qx * qx + qz * qz + qy * qy + qw * qw)
+	qx,qz,qy,qw = qx*s, qz*s, qy*s, qw*s
+	--convert to matrix but only grab the matrix indices we need. Basically this violently smashes together the matrix to zxy and quat to matrix code.
+	local m2 = 2*(qx*qy + qz*qw)
+	local m5 = 2*(qx*qy - qz*qw)
+	local m6 = 1-2*(qx^2 + qz^2)
+	local m7 = 2*(qy*qz + qx*qw)
+	local m9 = 2*(qx*qz + qy*qw)
+	local m10 = 2*(qy*qz - qx*qw)
+	local m11 = 1-2*(qx^2 + qy^2)
+
+	local X,Y,Z
+	if abs(m10)-1 < DBL_EPSILON then --check if x is 90 or -90. If it is yaw will experience gimbal lock and there will therefore be infinite solutions.
+		Z = atan2(m2, m6) --(cz*cx / sz*cx) = cz/cx = tz.
+		Y = atan2(m9, m11)
+		X = atan2(-m10, m6/cos(Z))
+	else
+		Z = atan2(m7, m5)
+		Y = 0 --pitch and roll are the same given x=90 or -90.
+		X = asin(-m10)
+	end
+	return X,Y,Z
+end
+
+--- alias of `get_euler_zxy`
+-- @function quat.get_rot_luanti_entity
+quat.get_euler_luanti_entity = quat.get_euler_zxy
+
+
+
+--- create a quaternion from euler angles in the ZXY rotation order. This is the rotation order Luanti Entities use
+-- @tparam float X
+-- @tparam float Y
+-- @tparam float Z
+-- @treturn quat q
+function quat.from_euler_zxy(X,Y,Z)
+	--I want to note that for no apparent reason at all the original matrix was transposed here
+	local cr = cos(Z)
+	local sr = sin(Z)
+	local cp = cos(X)
+	local sp = sin(X);
+	local cy = cos(Y)
+	local sy = sin(Y);
+
+	local m1 = sr * sp * sy + cr * cy
+	local m2 = sr * cp
+	local m3 = sr * sp * cy - cr * sy
+
+	local m5 = cr * sp * sy - sr * cy
+	local m6 = cr * cp
+	local m7 = cr * sp * cy + sr * sy
+
+	local m9 = cp * sy
+	local m10 = -sp
+	local m11 = cp * cy
+	local w = math.sqrt(1 + m1 + m6 + m11) / 2
+	return new(
+		(m7 - m10) /(4 * w),
+		(m9 - m3)  /(4 * w),
+		(m2 - m5)  /(4 * w),
+		w
+	)
+end
+
+--- alias of `from_euler_zxy`
+-- @function quat.get_rot_luanti_entity
+quat.from_euler_luanti_entity = quat.from_euler_zxy
+
+
+
+--- convert a quaternion to an xyz euler angles. This is the rotation order used by irrlicht bones.
+-- @tparam quat quaternion to convert
+-- @treturn X
+-- @treturn Y
+-- @treturn Z
+function quat.get_euler_xyz(q)
+	local qx, qy, qz, qw = q.x, q.y, q.z, q.w
+	local s = 1/sqrt(qx * qx + qz * qz + qy * qy + qw * qw)
+	qx,qz,qy,qw = qx*s, qz*s, qy*s, qw*s
+	--convert to matrix but only grab the matrix indices we need. Basically this violently smashes together the matrix to zxy and quat to matrix code.
+	local m1 = 1-2*(qy^2 + qz^2)
+	local m2 = 2*(qx*qy + qz*qw)
+	local m3 = 2*(qx*qz - qy*qw)
+	local m5 = 2*(qx*qy - qz*qw)
+	local m7 = 2*(qy*qz + qx*qw)
+	local m11 = 1-2*(qx^2 + qy^2)
+
+	local X,Y,Z
+	if abs(m3)-1 < DBL_EPSILON then --check if x is 90 or -90. If they are yaw will experience gimbal lock and there will therefore be infinite solutions.
+		Z = atan2(m2, m1)
+		Y = atan2(-m3, m1/cos(Z))
+		X = atan2(m7, m11)
+	else
+		--Z = atan2(M[], M[])
+		Y = asin[m3]
+		X = atan2(m5, m7)
+		Z = 0
+	end
+	return X,Y,Z
+end
+
+--- alias of `get_euler_xyz`
+-- @function quat.get_rot_irrlicht_bone
+quat.get_euler_irrlicht_bone = quat.get_euler_xyz
+
+
+
+--- create a quaternion from euler angles in the xyz rotation order. This is the rotation order irrlicht bones use
+-- @tparam float X
+-- @tparam float Y
+-- @tparam float Z
+-- @treturn quat q
+function quat.from_euler_xyz(X,Y,Z)
+	local cp = cos(X)
+	local sp = sin(X)
+	local cy = cos(Y)
+	local sy = sin(Y)
+	local cr = cos(Z)
+	local sr = sin(Z)
+
+	local m1 = (cy * cr)
+	local m2 = (cy * sr)
+	local m3 = (-sy)
+
+	local m5 = (sp * sy * cr - cp * sr)
+	local m6 = (sp * sy * sr + cp * cr)
+	local m7 = (sp * cy)
+
+	local m9 = (cp * sy * cr + sp * sr)
+	local m10 = (cp * sy * sr - sp * cr)
+	local m11 = (cp * cy)
+	local w = math.sqrt(1 + m1 + m6 + m11) / 2
+	return new(
+		(m7 - m10) /(4 * w),
+		(m9 - m3)  /(4 * w),
+		(m2 - m5)  /(4 * w),
+		w
+	)
+end
+--- alias of `quat.from_euler_zxy`
+--@function quat.get_rot_irrlicht_bone
+quat.from_euler_irrlicht_bone = quat.from_euler_xyz
 
 --- Convert a quaternion into a vec3.
 -- @tparam quat a Quaternion to convert

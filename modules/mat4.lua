@@ -3,10 +3,11 @@
 local constants = require(modules .. "constants")
 local vec2      = require(modules .. "vec2")
 local vec3      = require(modules .. "vec3")
-local quat      = require(modules .. "quat")
+--local quat      = require(modules .. "quat")
 local utils     = require(modules .. "utils")
 local precond   = require(modules .. "_private_precond")
 local private   = require(modules .. "_private_utils")
+local DBL_EPSILON = constants.DBL_EPSILON
 local sqrt      = math.sqrt
 local cos       = math.cos
 local sin       = math.sin
@@ -58,7 +59,8 @@ local tv4 = { 0, 0, 0, 0 }
 -- table Length 4 (4 vec4s)
 -- nil
 -- @treturn mat4 out
-function mat4.new(a)
+
+function mat4.new(a, ...)
 	local out = new()
 
 	-- 4x4 matrix
@@ -128,7 +130,33 @@ end
 -- @tparam quat q Rotation quaternion
 -- @treturn mat4 out
 function mat4.from_quaternion(q)
-	return mat4.from_angle_axis(q:to_angle_axis())
+	--q=q:normalize()
+	return mat4.set_rot_from_quaternion(identity(new()), q)
+end
+
+--- set the rotation of a matrix from a quaternion. Not sure at all where i got this code from, but it works...
+-- i refactored so it works with https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.html
+-- I think I got it from https://github.com/minetest/irrlicht/blob/7173c2c62997b6416f17b90f9a50bff11fef1c4c/include/quaternion.h#L367
+-- @tparam quat q rotation quaternion. only supports normal quaternion rotation (will normalize)
+function mat4.set_rot_from_quaternion(m, q)
+	local qx,qy,qz,qw = q.x,q.y,q.z,q.w
+	--normalize the quaternion
+	--local s = 1/sqrt(qx * qx + qy * qy + qz * qz + qw * qw)
+	local s = 1/sqrt(qx * qx + qz * qz + qy * qy + qw * qw)
+	qx,qy,qz,qw = qx*s,qy*s,qz*s,qw*s
+
+	m[1] = 1-2*(qy^2 + qz^2)
+	m[2] = 2*(qx*qy + qz*qw)
+	m[3] = 2*(qx*qz - qy*qw)
+
+	m[5] = 2*(qx*qy - qz*qw)
+	m[6] = 1-2*(qx^2 + qz^2)
+	m[7] = 2*(qy*qz + qx*qw)
+
+	m[9] = 2*(qx*qz + qy*qw)
+	m[10]= 2*(qy*qz - qx*qw)
+	m[11]= 1-2*(qx^2 + qy^2)
+	return m
 end
 
 --- Create a matrix from a direction/up pair.
@@ -185,6 +213,151 @@ function mat4.from_transform(trans, rot, scale)
 
 	return rsm
 end
+
+local tau = 2*math.pi
+local atan2 = math.atan2
+--- set the rotation of a given matrix in euler in the ZXY application order. This is the order that minetest entities are rotated in.
+-- @tparam float pitch the clockwise pitch in radians
+-- @tparam float yaw the clockwise yaw in radians
+-- @tparam float roll the clockwise yaw in roll
+-- @treturn matrix
+function mat4.set_rot_zxy(M, pitch,yaw,roll)
+	--minetest numeric.h
+	local cr = cos(roll)
+	local sr = sin(roll)
+	local cp = cos(pitch)
+	local sp = sin(pitch);
+	local cy = cos(yaw)
+	local sy = sin(yaw);
+
+	M[1] = sr * sp * sy + cr * cy
+	M[2] = sr * cp
+	M[3] = sr * sp * cy - cr * sy
+
+	M[5] = cr * sp * sy - sr * cy
+	M[6] = cr * cp
+	M[7] = cr * sp * cy + sr * sy
+
+	M[9] = cp * sy
+	M[10] = -sp
+	M[11] = cp * cy
+	return M
+end
+local asin = math.asin
+local abs = math.abs
+
+--- alias of `set_rot_zxy`. Sets the rotation of a given matrix in euler in the ZXY application order. This is the order that minetest entities are rotated in.
+-- @tparam float pitch the clockwise pitch in radians
+-- @tparam float yaw the clockwise yaw in radians
+-- @tparam float roll the clockwise yaw in roll
+-- @treturn matrix
+-- @function set_rot_luanti_entity
+mat4.set_rot_luanti_entity = mat4.set_rot_zxy
+
+
+
+
+
+
+--- get the ZXY euler rotation of the given matrix. This is the order that minetest entities are rotated in.
+-- @tparam matrix the matrix to get the rotation of
+-- @treturn float pitch
+-- @treturn float yaw
+-- @treturn float roll
+function mat4.get_rot_zxy(M)
+	local X,Y,Z
+	if abs(M[10])-1 < DBL_EPSILON then --check if x is 90 or -90. If it is yaw will experience gimbal lock and there will therefore be infinite solutions.
+		Z = atan2(M[2], M[6]) --(cz*cx / sz*cx) = cz/cx = tz.
+		Y = atan2(M[9], M[11])
+		X = atan2(-M[10], M[6]/cos(Z))
+	else
+		Z = atan2(M[7], M[5])
+		Y = 0 --pitch and roll are the same given x=90 or -90.
+		X = asin(-M[10])
+	end
+	return X,Y,Z
+end
+
+--- Alias of `get_rot_zxy`. Gets the ZXY euler rotation of the given matrix. This is the order that minetest entities are rotated in.
+-- @tparam matrix the matrix to get the rotation of
+-- @treturn float pitch
+-- @treturn float yaw
+-- @treturn float roll
+-- @function get_rot_luanti_entity
+mat4.get_rot_luanti_entity = mat4.get_rot_zxy
+
+
+
+
+
+--- set the rotation of a given matrix in euler in the XYZ application order. This is the rotation order irrlicht uses (i.e. for bones in Luanti)
+-- @tparam float pitch the clockwise pitch in radians
+-- @tparam float yaw the clockwise yaw in radians
+-- @tparam float roll the clockwise yaw in roll
+-- @treturn matrix
+function mat4.set_rot_xyz(M, pitch,yaw,roll)
+	--standard euler rotation matrices applied in XYZ order (matrix transformations are applied in inverse)
+	local cp = cos(pitch)
+	local sp = sin(pitch)
+	local cy = cos(yaw)
+	local sy = sin(yaw)
+	local cr = cos(roll)
+	local sr = sin(roll)
+
+	M[1] = (cy * cr)
+	M[2] = (cy * sr)
+	M[3] = (-sy)
+
+	M[5] = (sp * sy * cr - cp * sr)
+	M[6] = (sp * sy * sr + cp * cr)
+	M[7] = (sp * cy)
+
+	M[9] = (cp * sy * cr + sp * sr)
+	M[10] = (cp * sy * sr - sp * cr)
+	M[11] = (cp * cy)
+	return M
+end
+
+--- alias of `set_rot_xyz`. Sets the rotation of a given matrix in euler in the XYZ application order. This is the rotation order irrlicht uses (i.e. for bones in Luanti)
+-- @tparam float pitch the clockwise pitch in radians
+-- @tparam float yaw the clockwise yaw in radians
+-- @tparam float roll the clockwise yaw in roll
+-- @treturn matrix
+-- @function set_rot_irrlicht_bone
+mat4.set_rot_irrlicht_bone = mat4.set_rot_xyz
+
+
+
+--- Get the XYZ euler rotation of the given matrix. This is the rotation order irrlicht uses (i.e. for bones in Luanti)
+-- @tparam matrix the matrix to get the rotation of
+-- @treturn float pitch
+-- @treturn float yaw
+-- @treturn float roll
+function mat4.get_rot_xyz(M)
+	local X,Y,Z
+	if abs(M[3])-1 < DBL_EPSILON then --check if x is 90 or -90. If they are yaw will experience gimbal lock and there will therefore be infinite solutions.
+		Z = atan2(M[2], M[1])
+		Y = atan2(-M[3], M[1]/cos(Z))
+		X = atan2(M[7], M[11])
+	else
+		--Z = atan2(M[], M[])
+		Y = asin(M[3])
+		X = atan2(M[5], M[7])
+		Z = 0
+	end
+	return X,Y,Z
+end
+
+--- Alias of `get_rot_zxy`. Gets the XYZ euler rotation of the given matrix. This is the rotation order irrlicht uses (i.e. for bones in Luanti).
+-- @tparam matrix the matrix to get the rotation of
+-- @treturn float pitch
+-- @treturn float yaw
+-- @treturn float roll
+-- @function get_rot_irrlicht_bone
+mat4.get_rot_irrlicht_bone = mat4.get_rot_xyz
+
+
+
 
 --- Create matrix from orthogonal.
 -- @tparam number left
@@ -773,19 +946,18 @@ end
 --- Convert a matrix to a quaternion.
 -- @tparam mat4 a Matrix to be converted
 -- @treturn quat out
-function mat4.to_quat(a)
-	identity(tmp):transpose(a)
-
-	local w     = sqrt(1 + tmp[1] + tmp[6] + tmp[11]) / 2
-	local scale = w * 4
-	local q     = quat.new(
-		tmp[10] - tmp[7] / scale,
-		tmp[3]  - tmp[9] / scale,
-		tmp[5]  - tmp[2] / scale,
+local quat_new
+function mat4.to_quaternion(m)
+	--I want to note that for no apparent reason at all the original matrix was transposed here
+	if not quat_new then quat_new = mtul.math.quat.new end
+	local w = math.sqrt(1 + m[1] + m[6] + m[11]) / 2
+	local q=quat_new(
+		(m[7] - m[10]) /(4 * w),
+		(m[9] - m[3])  /(4 * w),
+		(m[2] - m[5])  /(4 * w),
 		w
 	)
-
-	return q:normalize(q)
+	return q
 end
 
 -- http://www.crownandcutlass.com/features/technicaldetails/frustum.html

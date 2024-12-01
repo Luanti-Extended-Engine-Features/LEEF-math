@@ -98,11 +98,7 @@
 	<td class="summary">Subtract a quaternion from another.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#mul">mul (a, b)</a></td>
-	<td class="summary">Multiply two quaternions.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#mul_vec3">mul_vec3 (a, b)</a></td>
+	<td class="name" nowrap><a href="#mul_vec3">mul_vec3 (a, v)</a></td>
 	<td class="summary">Multiply a quaternion and a vec3.</td>
 	</tr>
 	<tr>
@@ -131,7 +127,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#rotate">rotate (angle, axis, y, z)</a></td>
-	<td class="summary">Alias of from<em>angle</em>axis.</td>
+	<td class="summary">Alias of <code>from_angle_axis.</code></td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#conjugate">conjugate (a)</a></td>
@@ -186,12 +182,40 @@
 	<td class="summary">Convert a quaternion into an angle/axis pair.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#to_euler_angles_unpack">to_euler_angles_unpack (a)</a></td>
-	<td class="summary">Convert a quaternion into euler angle components</td>
+	<td class="name" nowrap><a href="#set_matrix_rot">set_matrix_rot (quaternion, the)</a></td>
+	<td class="summary">set a matrix's rotation fields from a quaternion.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#to_euler_angles">to_euler_angles (a)</a></td>
-	<td class="summary">Convert a quaternion into euler angles</td>
+	<td class="name" nowrap><a href="#from_matrix">from_matrix (the)</a></td>
+	<td class="summary">create a new quaternion from a matrix.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_luanti_entity">get_rot_luanti_entity ()</a></td>
+	<td class="summary">alias of <code>get_euler_zxy</code></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_euler_zxy">from_euler_zxy (X, Y, Z)</a></td>
+	<td class="summary">create a quaternion from euler angles in the ZXY rotation order.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_luanti_entity">get_rot_luanti_entity ()</a></td>
+	<td class="summary">alias of <code>from_euler_zxy</code></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_euler_xyz">get_euler_xyz (quaternion)</a></td>
+	<td class="summary">convert a quaternion to an xyz euler angles.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_irrlicht_bone">get_rot_irrlicht_bone ()</a></td>
+	<td class="summary">alias of <code>get_euler_xyz</code></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_euler_xyz">from_euler_xyz (X, Y, Z)</a></td>
+	<td class="summary">create a quaternion from euler angles in the xyz rotation order.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_irrlicht_bone">get_rot_irrlicht_bone ()</a></td>
+	<td class="summary">alias of <code>quat.from_euler_zxy</code></td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#to_vec3">to_vec3 (a)</a></td>
@@ -298,7 +322,7 @@
     <strong>from_direction (normal, up)</strong>
     </dt>
     <dd>
-    Create a quaternion from a normal/up vector pair.
+    Create a quaternion from a normal/up vector pair.  (accepts minetest vectors)
 
 
     <h3>Parameters:</h3>
@@ -416,42 +440,11 @@
 
 </dd>
     <dt>
-    <a name = "mul"></a>
-    <strong>mul (a, b)</strong>
-    </dt>
-    <dd>
-    Multiply two quaternions.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">a</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Left hand operand
-        </li>
-        <li><span class="parameter">b</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Right hand operand
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-        quaternion equivalent to "apply b, then a"
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "mul_vec3"></a>
-    <strong>mul_vec3 (a, b)</strong>
+    <strong>mul_vec3 (a, v)</strong>
     </dt>
     <dd>
-    Multiply a quaternion and a vec3.
+    Multiply a quaternion and a vec3.  Equivalent to rotating the vector (a) by the quaternion (v)
 
 
     <h3>Parameters:</h3>
@@ -460,7 +453,7 @@
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operand
         </li>
-        <li><span class="parameter">b</span>
+        <li><span class="parameter">v</span>
             <span class="types"><span class="type">vec3</span></span>
          Right hand operand
         </li>
@@ -656,7 +649,7 @@
     <strong>rotate (angle, axis, y, z)</strong>
     </dt>
     <dd>
-    Alias of from<em>angle</em>axis.
+    Alias of <code>from_angle_axis.</code>
 
 
     <h3>Parameters:</h3>
@@ -1084,36 +1077,32 @@
 
 </dd>
     <dt>
-    <a name = "to_euler_angles_unpack"></a>
-    <strong>to_euler_angles_unpack (a)</strong>
+    <a name = "set_matrix_rot"></a>
+    <strong>set_matrix_rot (quaternion, the)</strong>
     </dt>
     <dd>
-    Convert a quaternion into euler angle components
+    set a matrix's rotation fields from a quaternion.  Uses mat4.set<em>rot</em>from_quaternion
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">a</span>
+        <li><span class="parameter">quaternion</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to convert
+         to convert
+        </li>
+        <li><span class="parameter">the</span>
+            <span class="types"><span class="type">mat4</span></span>
+         mat4 to apply to.
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
-        <li>
-           <span class="types"><span class="type">roll</span></span>
+
+           <span class="types"><span class="type">mat4</span></span>
 
 
-</li>
-        <li>
-           <span class="types"><span class="type">pitch</span></span>
 
-
-</li>
-        <li>
-           <span class="types"><span class="type">yaw</span></span>
-        no idea if this shit really works, very well could not...</li>
     </ol>
 
 
@@ -1121,27 +1110,206 @@
 
 </dd>
     <dt>
-    <a name = "to_euler_angles"></a>
-    <strong>to_euler_angles (a)</strong>
+    <a name = "from_matrix"></a>
+    <strong>from_matrix (the)</strong>
     </dt>
     <dd>
-    Convert a quaternion into euler angles
+    create a new quaternion from a matrix.  Uses mat4.to_quaternion
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">a</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to convert
+        <li><span class="parameter">the</span>
+            <span class="types"><span class="type">mat4</span></span>
+         matrix to use
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">result</span></span>
-        a {roll, pitch, yaw} table
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+
+
+
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_luanti_entity"></a>
+    <strong>get_rot_luanti_entity ()</strong>
+    </dt>
+    <dd>
+    alias of <code>get_euler_zxy</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_euler_zxy"></a>
+    <strong>from_euler_zxy (X, Y, Z)</strong>
+    </dt>
+    <dd>
+    create a quaternion from euler angles in the ZXY rotation order.  This is the rotation order Luanti Entities use
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">X</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">Y</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">Z</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        q
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_luanti_entity"></a>
+    <strong>get_rot_luanti_entity ()</strong>
+    </dt>
+    <dd>
+    alias of <code>from_euler_zxy</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_euler_xyz"></a>
+    <strong>get_euler_xyz (quaternion)</strong>
+    </dt>
+    <dd>
+    convert a quaternion to an xyz euler angles.  This is the rotation order used by irrlicht bones.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">quaternion</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         to convert
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">X</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><span class="type">Y</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><span class="type">Z</span></span>
+
+
+</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_irrlicht_bone"></a>
+    <strong>get_rot_irrlicht_bone ()</strong>
+    </dt>
+    <dd>
+    alias of <code>get_euler_xyz</code>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_euler_xyz"></a>
+    <strong>from_euler_xyz (X, Y, Z)</strong>
+    </dt>
+    <dd>
+    create a quaternion from euler angles in the xyz rotation order.  This is the rotation order irrlicht bones use
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">X</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">Y</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">Z</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        q
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_irrlicht_bone"></a>
+    <strong>get_rot_irrlicht_bone ()</strong>
+    </dt>
+    <dd>
+    alias of <code>quat.from_euler_zxy</code>
+
+
+
 
 
 
@@ -1235,7 +1403,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/ldoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2024-01-06 19:06:14 </i>
+<i style="float:right;">Last updated 2024-11-30 20:09:10 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

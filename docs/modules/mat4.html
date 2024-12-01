@@ -89,12 +89,48 @@
 	<td class="summary">Create a matrix from a quaternion.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#set_rot_from_quaternion">set_rot_from_quaternion (q)</a></td>
+	<td class="summary">set the rotation of a matrix from a quaternion.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#from_direction">from_direction (direction, up)</a></td>
 	<td class="summary">Create a matrix from a direction/up pair.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#from_transform">from_transform (trans, rot, scale)</a></td>
 	<td class="summary">Create a matrix from a transform.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_rot_zxy">set_rot_zxy (pitch, yaw, roll)</a></td>
+	<td class="summary">set the rotation of a given matrix in euler in the ZXY application order.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_rot_luanti_entity">set_rot_luanti_entity (pitch, yaw, roll)</a></td>
+	<td class="summary">alias of <code>set_rot_zxy</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_zxy">get_rot_zxy (the)</a></td>
+	<td class="summary">get the ZXY euler rotation of the given matrix.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_luanti_entity">get_rot_luanti_entity (the)</a></td>
+	<td class="summary">Alias of <code>get_rot_zxy</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_rot_xyz">set_rot_xyz (pitch, yaw, roll)</a></td>
+	<td class="summary">set the rotation of a given matrix in euler in the XYZ application order.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set_rot_irrlicht_bone">set_rot_irrlicht_bone (pitch, yaw, roll)</a></td>
+	<td class="summary">alias of <code>set_rot_xyz</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_xyz">get_rot_xyz (the)</a></td>
+	<td class="summary">Get the XYZ euler rotation of the given matrix.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_rot_irrlicht_bone">get_rot_irrlicht_bone (the)</a></td>
+	<td class="summary">Alias of <code>get_rot_zxy</code>.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#from_ortho">from_ortho (left, right, top, bottom, near, far)</a></td>
@@ -309,6 +345,29 @@
 
 </dd>
     <dt>
+    <a name = "set_rot_from_quaternion"></a>
+    <strong>set_rot_from_quaternion (q)</strong>
+    </dt>
+    <dd>
+    set the rotation of a matrix from a quaternion.  Not sure at all where i got this code from, but it works...
+ i refactored so it works with https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.html
+ I think I got it from https://github.com/minetest/irrlicht/blob/7173c2c62997b6416f17b90f9a50bff11fef1c4c/include/quaternion.h#L367
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">q</span>
+            <span class="types"><span class="type">quat</span></span>
+         rotation quaternion. only supports normal quaternion rotation (will normalize)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "from_direction"></a>
     <strong>from_direction (direction, up)</strong>
     </dt>
@@ -368,6 +427,286 @@
 
            <span class="types"><span class="type">mat4</span></span>
         out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_rot_zxy"></a>
+    <strong>set_rot_zxy (pitch, yaw, roll)</strong>
+    </dt>
+    <dd>
+    set the rotation of a given matrix in euler in the ZXY application order.  This is the order that minetest entities are rotated in.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pitch</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise pitch in radians
+        </li>
+        <li><span class="parameter">yaw</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in radians
+        </li>
+        <li><span class="parameter">roll</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in roll
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">matrix</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_rot_luanti_entity"></a>
+    <strong>set_rot_luanti_entity (pitch, yaw, roll)</strong>
+    </dt>
+    <dd>
+    alias of <code>set_rot_zxy</code>.  Sets the rotation of a given matrix in euler in the ZXY application order. This is the order that minetest entities are rotated in.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pitch</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise pitch in radians
+        </li>
+        <li><span class="parameter">yaw</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in radians
+        </li>
+        <li><span class="parameter">roll</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in roll
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">matrix</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_zxy"></a>
+    <strong>get_rot_zxy (the)</strong>
+    </dt>
+    <dd>
+    get the ZXY euler rotation of the given matrix.  This is the order that minetest entities are rotated in.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">the</span>
+            <span class="types"><span class="type">matrix</span></span>
+         matrix to get the rotation of
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        pitch</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        yaw</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        roll</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_luanti_entity"></a>
+    <strong>get_rot_luanti_entity (the)</strong>
+    </dt>
+    <dd>
+    Alias of <code>get_rot_zxy</code>.  Gets the ZXY euler rotation of the given matrix. This is the order that minetest entities are rotated in.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">the</span>
+            <span class="types"><span class="type">matrix</span></span>
+         matrix to get the rotation of
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        pitch</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        yaw</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        roll</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_rot_xyz"></a>
+    <strong>set_rot_xyz (pitch, yaw, roll)</strong>
+    </dt>
+    <dd>
+    set the rotation of a given matrix in euler in the XYZ application order.  This is the rotation order irrlicht uses (i.e. for bones in Luanti)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pitch</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise pitch in radians
+        </li>
+        <li><span class="parameter">yaw</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in radians
+        </li>
+        <li><span class="parameter">roll</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in roll
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">matrix</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set_rot_irrlicht_bone"></a>
+    <strong>set_rot_irrlicht_bone (pitch, yaw, roll)</strong>
+    </dt>
+    <dd>
+    alias of <code>set_rot_xyz</code>.  Sets the rotation of a given matrix in euler in the XYZ application order. This is the rotation order irrlicht uses (i.e. for bones in Luanti)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pitch</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise pitch in radians
+        </li>
+        <li><span class="parameter">yaw</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in radians
+        </li>
+        <li><span class="parameter">roll</span>
+            <span class="types"><span class="type">float</span></span>
+         the clockwise yaw in roll
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">matrix</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_xyz"></a>
+    <strong>get_rot_xyz (the)</strong>
+    </dt>
+    <dd>
+    Get the XYZ euler rotation of the given matrix.  This is the rotation order irrlicht uses (i.e. for bones in Luanti)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">the</span>
+            <span class="types"><span class="type">matrix</span></span>
+         matrix to get the rotation of
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        pitch</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        yaw</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        roll</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_rot_irrlicht_bone"></a>
+    <strong>get_rot_irrlicht_bone (the)</strong>
+    </dt>
+    <dd>
+    Alias of <code>get_rot_zxy</code>.  Gets the XYZ euler rotation of the given matrix. This is the rotation order irrlicht uses (i.e. for bones in Luanti).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">the</span>
+            <span class="types"><span class="type">matrix</span></span>
+         matrix to get the rotation of
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        pitch</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        yaw</li>
+        <li>
+           <span class="types"><span class="type">float</span></span>
+        roll</li>
     </ol>
 
 
@@ -1166,7 +1505,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/ldoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2024-01-06 19:06:14 </i>
+<i style="float:right;">Last updated 2024-11-30 20:09:10 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
