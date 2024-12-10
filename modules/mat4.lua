@@ -524,8 +524,8 @@ end
 
 --- Multiply N matrices.
 -- @tparam mat4 out Matrix to store the result
--- @tparam mat4 or {mat4, ...} left hand operand(s)
--- @tparam mat4 right hand operand if a is not table
+-- @tparam table a a mat4 or a list of mat4s
+-- @tparam mat4 b right operand used if param a is a mat4
 -- @treturn mat4 out multiplied matrix result
 function mat4.mul(out, a, b)
 	if mat4.is_mat4(a) then
@@ -533,18 +533,14 @@ function mat4.mul(out, a, b)
 		return out
 	end
 	if #a == 0 then
-		identity(out)
-	elseif #a == 1 then
-		-- only one matrix, just copy
-		for i = 1, 16 do
-			out[i] = a[1][i]
-		end
+		error("incorrect operand, expected two mat4s or list of mat4s but recieved empty table.")
 	else
-		local ma = a[1]
-		local mb = a[2]
-		for i = 2, #a do
-			mul_internal(out, ma, mb)
-			ma = out
+		local new_mat = a[#a]
+		for i = #a-1, 1, -1 do
+			new_mat = a[i]*new_mat
+		end
+		for i=1,16 do
+			out[i] = new_mat[i]
 		end
 	end
 	return out
