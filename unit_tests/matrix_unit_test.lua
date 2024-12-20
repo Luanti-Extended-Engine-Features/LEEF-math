@@ -51,6 +51,8 @@ print("checking rotation matrix `set_rot_luanti_entity`")
 find_rot_order(leef.math.mat4.set_rot_luanti_entity)
 print("checking `set_rot_irrlicht_bone`")
 find_rot_order(leef.math.mat4.set_rot_irrlicht_bone)
+print("checking that mul(out, {mat, mat, mat}) performs in correct order. Inputting `XYZ`")
+find_rot_order(function(m,x,y,z) return mat4.multiply(mat4.identity(), {mat4.identity():rotate_X(x), mat4.identity():rotate_Y(y), mat4.identity():rotate_Z(z)}) end)
 
 --[[print("check in euler out euler for minetest entitiy matrix rotations")
 local x,y,z =(math.random()-.5)*math.pi*4,(math.random()-.5)*math.pi*4,(math.random()-.5)*math.pi*4

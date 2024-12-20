@@ -1,10 +1,9 @@
 local cos = math.cos
 local sin = math.sin
-local m = leef.math
 local mat4 = leef.math.mat4
 
 local pitch_ZY = function(a)
-    local temp = mat4.new()
+    local temp = mat4.identity()
     temp[6] = cos(a)
     temp[7] = sin(a)
     temp[10] = -sin(a)
@@ -12,7 +11,7 @@ local pitch_ZY = function(a)
     return temp
 end
 local pitch_ZY2 = function(a)
-    local temp = mat4.new()
+    local temp = mat4.identity()
     temp[6] = cos(a)
     temp[7] = -sin(a)
     temp[10] = sin(a)
@@ -21,7 +20,7 @@ local pitch_ZY2 = function(a)
 end
 
 local roll_XY = function(a)
-    local temp = mat4.new()
+    local temp = mat4.identity()
     temp[1] = cos(a)
     temp[2] = sin(a)
     temp[5] = -sin(a)
@@ -29,7 +28,7 @@ local roll_XY = function(a)
     return temp
 end
 local roll_XY2 = function(a)
-    local temp = mat4.new()
+    local temp = mat4.identity()
     temp[1] = cos(a)
     temp[2] = -sin(a)
     temp[5] = sin(a)
@@ -37,7 +36,7 @@ local roll_XY2 = function(a)
     return temp
 end
 local yaw_ZX = function(a)
-    local temp = mat4.new()
+    local temp = mat4.identity()
     temp[1] = cos(a)
     temp[3] = -sin(a)
     temp[9] = sin(a)
@@ -45,7 +44,7 @@ local yaw_ZX = function(a)
     return temp
 end
 local yaw_ZX2 = function(a)
-    local temp = mat4.new()
+    local temp = mat4.identity()
     temp[1] = cos(a)
     temp[3] = sin(a)
     temp[9] = -sin(a)
@@ -100,7 +99,7 @@ end
 function leef.math.find_matrix_rotation_order(check_func)
     --x,y,z
     local euler = {(math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4}
-    local output = check_func(mat4.new(), euler[1],euler[2],euler[3])
+    local output = check_func(mat4.identity(), euler[1],euler[2],euler[3])
     local iter = 0
     local running_order
     for _, p_tf in pairs(pitch_transforms)  do
@@ -111,7 +110,7 @@ function leef.math.find_matrix_rotation_order(check_func)
                     iter = iter + 1
                     --intrinsic order is pitch yaw roll for this check, meaning that 1 is assigned to pitch and so fourth.
                     local matrices = {p_tf, y_tf, r_tf}
-                    local active_mat = mat4.new()
+                    local active_mat = mat4.identity()
                     running_order = nil
                     for i=1,3 do
                         local func = matrices[order[i]]
@@ -134,14 +133,23 @@ print("================== BEGINNING LUANTI AND IRRLICHT UNIT TESTs =============
 local find_rot_order = leef.math.find_matrix_rotation_order
 print("\n checking sanity of tests:")
 local _tempeuler = {(math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4, (math.random()-.5)*math.pi*4}
-local _testmatrix = leef.math.mat4.set_rot_zxy(mat4.new(), _tempeuler[1],_tempeuler[2],_tempeuler[3])
+local _testmatrix = leef.math.mat4.set_rot_zxy(mat4.identity(), _tempeuler[1],_tempeuler[2],_tempeuler[3])
 print("matrix equality check func is sane:", check_matrix_equality(_testmatrix,_testmatrix))
 print("matrix equality check func tolerance:", matrix_tolerance)
 
-print("\n Checking rotation orders. Rotation application order is in reverse, these are the literal matrix multiplication order. ")
+--[[print("\n Checking rotation orders. Rotation application order is in reverse, these are the literal matrix multiplication order. ")
 print("checking rotation matrix `set_rot_luanti_entity`")
 find_rot_order(leef.math.mat4.set_rot_luanti_entity)
 print("checking `set_rot_irrlicht_bone`")
-find_rot_order(leef.math.mat4.set_rot_irrlicht_bone)
+find_rot_order(leef.math.mat4.set_rot_irrlicht_bone)]]
+
+print("checking rotation axis functions `rotate_X` `rotate_Y` and `rotate_Z`")
+find_rot_order(function(m, x,y,z)
+    return m:rotate_X(x):rotate_Y(y):rotate_Z(z)
+end)
+local t = (math.random()-.5)*math.pi*4
+print("checking `rotate_X`", check_matrix_equality(pitch_ZY(t), mat4.identity():rotate_X(t)))
+print("checking `rotate_Y`", check_matrix_equality(yaw_ZX(t), mat4.identity():rotate_Y(t)))
+print("checking `rotate_Z`", check_matrix_equality(roll_XY(t), mat4.identity():rotate_Z(t)))
 
 print("================== ENDING LUANTI AND IRRLICHT UNIT TESTs =======================")

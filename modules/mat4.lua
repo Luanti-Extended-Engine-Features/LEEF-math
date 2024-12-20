@@ -254,10 +254,76 @@ local abs = math.abs
 -- @function set_rot_luanti_entity
 mat4.set_rot_luanti_entity = mat4.set_rot_zxy
 
+--- rotates a matrix on the ZX matrix (otherwise known as yaw in coordinate systems where Y is up)
+function mat4.rotate_Y(m, r, use_identity)
+	local cy = cos(r)
+	local sy = sin(r)
+	tm4[1] = m[3]*sy + m[1]*cy
+	tm4[2] = m[2]
+	tm4[3] = m[3]*cy - m[1]*sy
+	tm4[4] = m[4]
 
+	tm4[5] = m[7]*sy + m[5]*cy
+	tm4[6] = m[6]
+	tm4[7] = m[7]*cy - m[5]*sy
+	tm4[8] = m[8]
 
+	tm4[9] = m[11]*sy + m[9]*cy
+	tm4[10] = m[10]
+	tm4[11] = m[11]*cy - m[9]*sy
+	tm4[12] = m[12]
 
+	for i = 1, 12 do
+		m[i] = tm4[i]
+	end
+	return m
+end
+function mat4.rotate_Z(m, r, use_identity)
+	local cz = cos(r)
+	local sz = sin(r)
+	tm4[1] = m[1]*cz - m[2]*sz
+	tm4[2] = m[1]*sz + m[2]*cz
+	tm4[3] = m[3]
+	tm4[4] = m[4]
 
+	tm4[5] = m[5]*cz - m[6]*sz
+	tm4[6] = m[5]*sz + m[6]*cz
+	tm4[7] = m[7]
+	tm4[8] = m[8]
+
+	tm4[9] = m[9]*cz - m[10]*sz
+	tm4[10] = m[9]*sz + m[10]*cz
+	tm4[11] = m[11]
+	tm4[12] = m[12]
+
+	for i = 1, 12 do
+		m[i] = tm4[i]
+	end
+	return m
+end
+function mat4.rotate_X(m, r, use_identity)
+	local cz = cos(r)
+	local sz = sin(r)
+	tm4[1] = m[1]
+	tm4[2] = m[2]*cz - m[3]*sz
+	tm4[3] = m[2]*sz + m[3]*cz
+	tm4[4] = m[4]
+
+	tm4[5] = m[5]
+	tm4[6] = m[6]*cz - m[7]*sz
+	tm4[7] = m[6]*sz + m[7]*cz
+	tm4[8] = m[8]
+
+	tm4[9] = m[9]
+	tm4[10] = m[10]*cz - m[11]*sz
+	tm4[11] = m[10]*sz + m[11]*cz
+	tm4[12] = m[12]
+
+	for i = 1, 12 do
+		m[i] = tm4[i]
+	end
+	return m
+end
 
 --- get the ZXY euler rotation of the given matrix. This is the order that minetest entities are rotated in.
 -- @tparam matrix the matrix to get the rotation of
@@ -285,9 +351,6 @@ end
 -- @treturn float roll
 -- @function get_rot_luanti_entity
 mat4.get_rot_luanti_entity = mat4.get_rot_zxy
-
-
-
 
 
 --- set the rotation of a given matrix in euler in the XYZ application order. This is the rotation order irrlicht uses (i.e. for bones in Luanti)
@@ -522,6 +585,8 @@ function mul_internal(out, a, b)
 	end
 end
 
+
+local mul_tm4 = mat4.new()
 --- Multiply N matrices.
 -- @tparam mat4 out Matrix to store the result
 -- @tparam table a a mat4 or a list of mat4s
@@ -535,16 +600,23 @@ function mat4.mul(out, a, b)
 	if #a == 0 then
 		error("incorrect operand, expected two mat4s or list of mat4s but recieved empty table.")
 	else
-		local new_mat = a[#a]
-		for i = #a-1, 1, -1 do
-			new_mat = a[i]*new_mat
+		mul_internal(mul_tm4, a[#a-1], a[#a])
+		for i = #a-2, 1, -1 do
+			mul_internal(mul_tm4, a[i], mul_tm4)
 		end
 		for i=1,16 do
-			out[i] = new_mat[i]
+			out[i] = mul_tm4[i]
 		end
 	end
 	return out
 end
+--- Multiply N matrices.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam table a a mat4 or a list of mat4s
+-- @tparam mat4 b right operand used if param a is a mat4
+-- @treturn mat4 out multiplied matrix result
+-- @function multiply
+mat4.multiply = mat4.mul
 
 --- Multiply a matrix and a vec3, with perspective division.
 -- This function uses an implicit 1 for the fourth component.
