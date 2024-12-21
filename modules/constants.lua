@@ -1,5 +1,5 @@
 --- Various useful constants
--- @module constants
+-- @module math.constants
 
 --- Constants
 -- @table constants

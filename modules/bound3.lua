@@ -1,5 +1,5 @@
 --- A 3-component axis-aligned bounding box.
--- @module bound3
+-- @module math.bound3
 
 local vec3    = require(modules .. "vec3")
 

@@ -1,5 +1,5 @@
 --- A 2 component vector.
--- @module vec2
+-- @module math.vec2
 
 local vec3    = require(modules .. "vec3")
 local precond = require(modules .. "_private_precond")

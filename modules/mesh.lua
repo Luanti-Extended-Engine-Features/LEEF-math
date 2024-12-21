@@ -1,5 +1,5 @@
 --- Mesh utilities
--- @module mesh
+-- @module math.mesh
 
 local vec3    = require(modules .. "vec3")
 local mesh    = {}

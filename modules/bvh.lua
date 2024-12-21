@@ -1,7 +1,7 @@
 -- https://github.com/benraziel/bvh-tree
 
 --- BVH Tree
--- @module bvh
+-- @module math.bvh
 
 local intersect = require(modules .. "intersect")
 local vec3      = require(modules .. "vec3")

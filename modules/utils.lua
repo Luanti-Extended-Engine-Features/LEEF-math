@@ -1,5 +1,5 @@
 --- Various utility functions
--- @module utils
+-- @module math.utils
 
 local vec2    = require(modules .. "vec2")
 local vec3    = require(modules .. "vec3")

@@ -1,5 +1,5 @@
 --- Simplex Noise
--- @module simplex
+-- @module math.simplex
 
 --
 -- Based on code in "Simplex noise demystified", by Stefan Gustavson

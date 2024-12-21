@@ -4,7 +4,7 @@
 -- https://github.com/Nition/UnityOctree/blob/master/Scripts/BoundsOctreeNode.cs
 
 --- Octree
--- @module octree
+-- @module math.octree
 
 local intersect  = require(modules .. "intersect")
 local mat4       = require(modules .. "mat4")

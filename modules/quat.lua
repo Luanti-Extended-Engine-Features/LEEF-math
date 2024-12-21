@@ -1,5 +1,5 @@
 --- A quaternion and associated utilities.
--- @module quat
+-- @module math.quat
 
 local constants     = require(modules .. "constants")
 local vec3          = require(modules .. "vec3")

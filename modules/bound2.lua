@@ -1,5 +1,5 @@
 --- A 2 component bounding box.
--- @module bound2
+-- @module math.bound2
 
 local vec2    = require(modules .. "vec2")
 

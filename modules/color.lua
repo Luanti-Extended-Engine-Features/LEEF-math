@@ -1,5 +1,5 @@
 --- Color utilities
--- @module color
+-- @module math.color
 
 local constants = require(modules .. "constants")
 local utils    = require(modules .. "utils")

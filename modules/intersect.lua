@@ -1,5 +1,5 @@
 --- Various geometric intersections
--- @module intersect
+-- @module math.intersect
 
 local constants   = require(modules .. "constants")
 local mat4        = require(modules .. "mat4")
