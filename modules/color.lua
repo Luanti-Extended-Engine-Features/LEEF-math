@@ -1,4 +1,5 @@
---- Color utilities
+--- Color utilities.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.color
 
 local constants = require(modules .. "constants")

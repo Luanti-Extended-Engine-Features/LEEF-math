@@ -1,4 +1,5 @@
 --- A 3-component axis-aligned bounding box.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.bound3
 
 local vec3    = require(modules .. "vec3")

@@ -1,4 +1,5 @@
---- Mesh utilities
+--- Mesh utilities.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.mesh
 
 local vec3    = require(modules .. "vec3")

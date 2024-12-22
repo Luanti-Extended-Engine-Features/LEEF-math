@@ -1,4 +1,6 @@
---- Various geometric intersections
+--- Various geometric intersections.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module.
+-- note that everything within this module uses CPML types. Since this had no documentation initially, documentation is a WIP.
 -- @module math.intersect
 
 local constants   = require(modules .. "constants")
@@ -12,11 +14,51 @@ local min         = math.min
 local max         = math.max
 local intersect   = {}
 
--- https://blogs.msdn.microsoft.com/rezanour/2011/08/07/barycentric-coordinates-and-point-in-triangle-tests/
--- point       is a vec3
--- triangle[1] is a vec3
--- triangle[2] is a vec3
--- triangle[3] is a vec3
+--- frustrum
+-- where `a`, `b`, `c` and `d` are vec3s
+-- @field left plane `{a, b, c, d}`
+-- @field right plane `{a, b, c, d}`
+-- @field bottom plane `{a, b, c, d}`
+-- @field top plane `{a, b, c, d}`
+-- @field near plane `{a, b, c, d}`
+-- @field far plane `{a, b, c, d}` (optional)
+-- @table frustrum
+
+--- ray
+-- infinite ray
+-- @field direction vec3
+-- @field position vec3
+-- @table ray
+
+--- sphere
+-- @field position vec3
+-- @field radius float
+-- @table sphere
+
+--- triangle
+-- @field 1 vec3
+-- @field 2 vec3
+-- @field 3 vec3
+-- @table triangle
+
+--- aabb
+-- axis aligned bounding box
+-- @field min vec3
+-- @field max vec3
+-- @table aabb
+
+--- plane
+-- infinite plane
+-- @field position vec3
+-- @field normal "upward" direction of the plane
+-- @table plane
+
+
+--https://blogs.msdn.microsoft.com/rezanour/2011/08/07/barycentric-coordinates-and-point-in-triangle-tests/
+--- Check if a point intersects with a triangle
+-- @tparam vec3 point
+-- @tparam table triangle a @{triangle}
+-- @treturn bool
 function intersect.point_triangle(point, triangle)
 	local u = triangle[2] - triangle[1]
 	local v = triangle[3] - triangle[1]
@@ -46,6 +88,10 @@ end
 -- point    is a vec3
 -- aabb.min is a vec3
 -- aabb.max is a vec3
+
+--- check if a point is inside an Axis Aligned Bounding Box
+-- @tparam vec3 point
+-- @tparam table aabb @{aabb}
 function intersect.point_aabb(point, aabb)
 	return
 		aabb.min.x <= point.x and
@@ -56,13 +102,10 @@ function intersect.point_aabb(point, aabb)
 		aabb.max.z >= point.z
 end
 
--- point          is a vec3
--- frustum.left   is a plane { a, b, c, d }
--- frustum.right  is a plane { a, b, c, d }
--- frustum.bottom is a plane { a, b, c, d }
--- frustum.top    is a plane { a, b, c, d }
--- frustum.near   is a plane { a, b, c, d }
--- frustum.far    is a plane { a, b, c, d }
+--- check if a point intersects with a frustrum
+-- @tparam vec3 point
+-- @tparam table frustrum a @{frustrum}
+-- @treturn bool
 function intersect.point_frustum(point, frustum)
 	local x, y, z = point:unpack()
 	local planes  = {
@@ -91,12 +134,12 @@ function intersect.point_frustum(point, frustum)
 end
 
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
--- ray.position  is a vec3
--- ray.direction is a vec3
--- triangle[1]   is a vec3
--- triangle[2]   is a vec3
--- triangle[3]   is a vec3
--- backface_cull is a boolean (optional)
+
+--- check wether an infinite ray intersects with a triangle
+-- @tparam table ray @{ray}
+-- @tparam table triangle @{triangle}
+-- @tparam bool backface_cull (optional) wether backface culling is enabled
+-- @treturn bool
 function intersect.ray_triangle(ray, triangle, backface_cull)
 	local e1 = triangle[2] - triangle[1]
 	local e2 = triangle[3] - triangle[1]
@@ -144,10 +187,11 @@ function intersect.ray_triangle(ray, triangle, backface_cull)
 end
 
 -- https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
--- ray.position    is a vec3
--- ray.direction   is a vec3
--- sphere.position is a vec3
--- sphere.radius   is a number
+
+--- check if a ray and a sphere intersect
+-- @tparam table ray a @{ray}
+-- @tparam table sphere a @{sphere}
+-- @treturn bool
 function intersect.ray_sphere(ray, sphere)
 	local offset = ray.position - sphere.position
 	local b = offset:dot(ray.direction)
@@ -175,10 +219,11 @@ function intersect.ray_sphere(ray, sphere)
 end
 
 -- http://gamedev.stackexchange.com/a/18459
--- ray.position  is a vec3
--- ray.direction is a vec3
--- aabb.min      is a vec3
--- aabb.max      is a vec3
+
+--- check if a ray and an aabb
+-- @tparam table ray @{ray}
+-- @tparam table aabb @{aabb}
+-- @treturn bool
 function intersect.ray_aabb(ray, aabb)
 	local dir     = ray.direction:normalize()
 	local dirfrac = vec3(
@@ -212,10 +257,11 @@ function intersect.ray_aabb(ray, aabb)
 end
 
 -- http://stackoverflow.com/a/23976134/1190664
--- ray.position   is a vec3
--- ray.direction  is a vec3
--- plane.position is a vec3
--- plane.normal   is a vec3
+
+--- check if a ray and a plane intersect
+-- @tparam table ray @{ray}
+-- @tparam table plane @{plane}
+-- @treturn bool
 function intersect.ray_plane(ray, plane)
 	local denom = plane.normal:dot(ray.direction)
 
@@ -251,11 +297,13 @@ function intersect.ray_capsule(ray, capsule)
 end
 
 -- https://web.archive.org/web/20120414063459/http://local.wasp.uwa.edu.au/~pbourke//geometry/lineline3d/
--- a[1] is a vec3
--- a[2] is a vec3
--- b[1] is a vec3
--- b[2] is a vec3
--- e    is a number
+
+--- compute the shortest line segment between two lines
+-- @tparam table a line {vec3, vec3}
+-- @tparam table b line {vec3, vec3}
+-- @tparam float e (optional) the minimum distance between the two lines
+-- @return (**false** | **table**). Closest points on both lines: {vec3, vec3}, where the first vector is a, and second b.
+-- @return (**nil** | **vec3**). Distance between the lines
 function intersect.line_line(a, b, e)
 	-- new points
 	local p13 = a[1] - b[1]
@@ -297,11 +345,12 @@ function intersect.line_line(a, b, e)
 	return { out1, out2 }, dist
 end
 
--- a[1] is a vec3
--- a[2] is a vec3
--- b[1] is a vec3
--- b[2] is a vec3
--- e    is a number
+--- the same as @{line_line} but the lines represent segments (which are not infinite)
+-- @tparam table a segment {vec3, vec3}
+-- @tparam table b segment {vec3, vec3}
+-- @tparam float e (optional) the minimum distance between the two lines
+-- @return (**false** | **table**). Closest points on both segments: {vec3, vec3}, where the first vector is a, and second b.
+-- @return (**nil** | **float**). Distance between the segments
 function intersect.segment_segment(a, b, e)
 	local c, d = intersect.line_line(a, b, e)
 
@@ -341,10 +390,10 @@ function intersect.segment_segment(a, b, e)
 	return false
 end
 
--- a.min is a vec3
--- a.max is a vec3
--- b.min is a vec3
--- b.max is a vec3
+--- check if two aabbs intersect
+-- @tparam table a @{aabb}
+-- @tparam table b @{aabb}
+-- @treturn bool
 function intersect.aabb_aabb(a, b)
 	return
 		a.min.x <= b.max.x and
@@ -355,11 +404,11 @@ function intersect.aabb_aabb(a, b)
 		a.max.z >= b.min.z
 end
 
--- aabb.position is a vec3
--- aabb.extent   is a vec3 (half-size)
--- obb.position  is a vec3
--- obb.extent    is a vec3 (half-size)
--- obb.rotation  is a mat4
+--- check if an aabb and a obb (oriented bounding box) intersect
+-- WARNING: this does not use the previously established system for aabbs
+-- @tparam table aabb `{position=vec3, extent=vec3}` where position is the center of the object, and extent is the width on each axis.
+-- @tparam table obb `{position=vec3, extent=vec3, rotation=mat4}`
+-- @return (**false** | **vec3**). Side of the obb that intersects
 function intersect.aabb_obb(aabb, obb)
 	local a   = aabb.extent
 	local b   = obb.extent
@@ -433,6 +482,11 @@ end
 -- sphere.position is a vec3
 -- sphere.radius   is a number
 local axes = { "x", "y", "z" }
+
+--- check wheter an aabb and sphere intersection
+-- @tparam table aabb @{aabb}
+-- @tparam sphere @{sphere}
+-- @treturn bool
 function intersect.aabb_sphere(aabb, sphere)
 	local dist2 = sphere.radius ^ 2
 
@@ -459,6 +513,10 @@ end
 -- frustum.top    is a plane { a, b, c, d }
 -- frustum.near   is a plane { a, b, c, d }
 -- frustum.far    is a plane { a, b, c, d }
+
+--- check if an aabb and frustrum intersect
+-- @tparam table aabb @{aabb}
+-- @tparam table frustrum @{frustrum}
 function intersect.aabb_frustum(aabb, frustum)
 	-- Indexed for the 'index trick' later
 	local box = {
@@ -524,14 +582,6 @@ end
 -- b.position is a vec3
 -- b.radius   is a number
 function intersect.circle_circle(a, b)
-	return a.position:dist(b.position) <= a.radius + b.radius
-end
-
--- a.position is a vec3
--- a.radius   is a number
--- b.position is a vec3
--- b.radius   is a number
-function intersect.sphere_sphere(a, b)
 	return intersect.circle_circle(a, b)
 end
 

@@ -19,9 +19,13 @@ For best memory performance: have luaJIT & it's FFI library (this should be buil
 Various useful bits of game math. 3D line intersections, ray casting, 2d/3d vectors, 4x4 matrices, quaternions, etc.
 
 This is a fork of CPML (for LÖVE/love3d), it's been ported over the minetest so it can be used in whatever you need it for.
-Documentation can be found here: <hhttps://luanti-extended-engine-features.github.io/LEEF-Math/>.
+Documentation can be found [here](https://luanti-extended-engine-features.github.io/documentation).
 
 For possible future contributors: documentation must be generated manually when a commit is made, because I haven't set up workflows (and have no idea how to).
 
 ### TODO:
-* Vec3s and Vec2s are not currently adapted for functionality with MT vectors, fix.
+* make leef.math.vec3 compatible with core.vector
+* make memory better memory allocation options for vec3s
+* improve intersect module runtime memory allocations
+* finish intersect module documentation
+* fix documentation errors in color and mat4

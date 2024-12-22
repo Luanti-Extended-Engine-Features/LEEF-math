@@ -1,4 +1,5 @@
---- double 4x4, 1-based, column major matrices
+--- double 4x4, 1-based, column major matrices.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.mat4
 local constants = require(modules .. "constants")
 local vec2      = require(modules .. "vec2")

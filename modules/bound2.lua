@@ -1,4 +1,5 @@
 --- A 2 component bounding box.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.bound2
 
 local vec2    = require(modules .. "vec2")

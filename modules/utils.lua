@@ -1,4 +1,5 @@
---- Various utility functions
+--- Various utility functions.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.utils
 
 local vec2    = require(modules .. "vec2")

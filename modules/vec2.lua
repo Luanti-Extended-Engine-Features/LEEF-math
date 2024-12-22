@@ -1,4 +1,5 @@
 --- A 2 component vector.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.vec2
 
 local vec3    = require(modules .. "vec3")

@@ -1,4 +1,6 @@
---- Simplex Noise
+--- Simplex Noise.
+-- (call with `leef.math.simplex()`).
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.simplex
 
 --
@@ -326,10 +328,11 @@ local function simplex_4d(x, y, z, w)
 end
 
 --- Simplex Noise
+-- @function simplex
 -- @param x
 -- @param y
--- @param z optional
--- @param w optional
+-- @param z (optional)
+-- @param w (optional)
 -- @return Noise value in the range [-1, +1]
 return function(x, y, z, w)
 	if w then

@@ -1,4 +1,5 @@
---- Various useful constants
+--- Various useful constants.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.constants
 
 --- Constants

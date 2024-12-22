@@ -1,4 +1,5 @@
 --- A quaternion and associated utilities.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.quat
 
 local constants     = require(modules .. "constants")

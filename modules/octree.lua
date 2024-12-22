@@ -3,7 +3,8 @@
 -- https://github.com/Nition/UnityOctree/blob/master/Scripts/BoundsOctree.cs
 -- https://github.com/Nition/UnityOctree/blob/master/Scripts/BoundsOctreeNode.cs
 
---- Octree
+--- Octree.
+-- this is apart of the [LEEF-math](https://github.com/Luanti-Extended-Engine-Features/LEEF-math) module
 -- @module math.octree
 
 local intersect  = require(modules .. "intersect")
