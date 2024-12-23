@@ -83,14 +83,17 @@ function quat.aim_at_point(quat)
 end]]
 
 --- Create a quaternion from an angle/axis pair.
--- @tparam number angle Angle (in radians)
--- @param axis/x -- Can be of two types, a vec3 axis, or the x component of that axis
--- @param y axis -- y component of axis (optional, only if x component param used)
--- @param z axis -- z component of axis (optional, only if x component param used)
+-- @tparam float angle Angle (in radians)
+-- @param x (**_float_** | **_vec3_**) Can be of two types, a vec3 axis, or the x component of that axis
+-- @tparam float y component of axis (only used if x is float)
+-- @tparam float z component of axis (only used if x is float)
 -- @treturn quat out
-function quat.from_angle_axis(angle, axis, a3, a4)
+function quat.from_angle_axis(angle, x, y, z)
+	local axis = x
+	local a3 = y
+	local a4 = z
 	if axis and a3 and a4 then
-		local x, y, z = axis, a3, a4
+		x, y, z = axis, a3, a4
 		local s = sin(angle * 0.5)
 		local c = cos(angle * 0.5)
 		return new(x * s, y * s, z * s, c)
@@ -255,13 +258,13 @@ function quat.scale(a, s)
 end
 
 --- Alias of `from_angle_axis.`
--- @tparam number angle Angle (in radians)
--- @param axis/x -- Can be of two types, a vec3 axis, or the x component of that axis
--- @param y axis -- y component of axis (optional, only if x component param used)
--- @param z axis -- z component of axis (optional, only if x component param used)
+-- @tparam float angle Angle (in radians)
+-- @param x (**_float_** | **_vec3_**) Can be of two types, a vec3 axis, or the x component of that axis
+-- @tparam float y component of axis (only used if x is float)
+-- @tparam float z component of axis (only used if x is float)
 -- @treturn quat out
-function quat.rotate(angle, axis, a3, a4)
-	return quat.from_angle_axis(angle, axis, a3, a4)
+function quat.rotate(angle, x, y, z)
+	return quat.from_angle_axis(angle, x, y, z)
 end
 
 --- Return the conjugate of a quaternion.
@@ -398,11 +401,11 @@ end
 
 --- Convert a quaternion into an angle plus axis components.
 -- @tparam quat a Quaternion to convert
--- @tparam identityAxis vec3 of axis to use on identity/degenerate quaternions (optional, default returns 0,0,0,1)
--- @treturn number angle
--- @treturn x axis-x
--- @treturn y axis-y
--- @treturn z axis-z
+-- @tparam vec3 identityAxis of axis to use on identity/degenerate quaternions (optional, default returns 0,0,0,1)
+-- @treturn float angle
+-- @treturn float x
+-- @treturn float y
+-- @treturn float z
 function quat.to_angle_axis_unpack(a, identityAxis)
 	if a.w > 1 or a.w < -1 then
 		a = a:normalize()
@@ -438,7 +441,7 @@ end
 
 --- Convert a quaternion into an angle/axis pair.
 -- @tparam quat a Quaternion to convert
--- @tparam identityAxis vec3 of axis to use on identity/degenerate quaternions (optional, default returns 0,vec3(0,0,1))
+-- @tparam vec3 identityAxis of axis to use on identity/degenerate quaternions (optional, default returns 0,0,0,1)
 -- @treturn number angle
 -- @treturn vec3 axis
 function quat.to_angle_axis(a, identityAxis)
@@ -447,8 +450,8 @@ function quat.to_angle_axis(a, identityAxis)
 end
 
 --- set a matrix's rotation fields from a quaternion. Uses mat4.set_rot_from_quaternion
--- @tparam quat quaternion to convert
--- @tparam mat4 the mat4 to apply to.
+-- @tparam quat q to convert
+-- @tparam mat4 m the mat4 to apply to.
 -- @treturn mat4
 function quat.set_matrix_rot(q, m)
 	m:set_rot_from_quaternion(q)
@@ -456,7 +459,7 @@ function quat.set_matrix_rot(q, m)
 end
 
 --- create a new quaternion from a matrix. Uses mat4.to_quaternion
--- @tparam mat4 the matrix to use
+-- @tparam mat4 m the matrix to use
 -- @treturn quat
 function quat.from_matrix(m)
 	return m:to_quaternion()
@@ -545,7 +548,7 @@ quat.from_euler_luanti_entity = quat.from_euler_zxy
 
 
 --- convert a quaternion to an xyz euler angles. This is the rotation order used by irrlicht bones.
--- @tparam quat quaternion to convert
+-- @tparam quat q quaternion to convert
 -- @treturn X
 -- @treturn Y
 -- @treturn Z
