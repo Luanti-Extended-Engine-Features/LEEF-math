@@ -14,7 +14,7 @@ local min         = math.min
 local max         = math.max
 local intersect   = {}
 
---- frustrum
+--- A frustrum
 -- where `a`, `b`, `c` and `d` are vec3s
 -- @field left plane `{a, b, c, d}`
 -- @field right plane `{a, b, c, d}`
@@ -24,34 +24,37 @@ local intersect   = {}
 -- @field far plane `{a, b, c, d}` (optional)
 -- @table frustrum
 
---- ray
--- infinite ray
--- @field direction vec3
--- @field position vec3
+--- An infinite ray
+-- @field direction (**vec3**)
+-- @field position (**vec3**)
 -- @table ray
 
---- sphere
--- @field position vec3
--- @field radius float
+--- A sphere
+-- @field position (**vec3**)
+-- @field radius (**float**)
 -- @table sphere
 
---- triangle
--- @field 1 vec3
--- @field 2 vec3
--- @field 3 vec3
+--- A 3d triangle
+-- @field 1 (**vec3**)
+-- @field 2 (**vec3**)
+-- @field 3 (**vec3**)
 -- @table triangle
 
---- aabb
--- axis aligned bounding box
--- @field min vec3
--- @field max vec3
+--- An axis aligned bounding box
+-- @field min (**vec3**)
+-- @field max (**vec3**)
 -- @table aabb
 
---- plane
--- infinite plane
--- @field position vec3
--- @field normal "upward" direction of the plane
+--- An infinite plane
+-- @field position (**vec3**)
+-- @field normal (**vec3**) "upward" direction of the plane
 -- @table plane
+
+--- a segment with a radius
+-- @field a (**vec3**) first position of the "segment"
+-- @field b (**vec3**) second position of the "segment"
+-- @field radius (**float**)
+-- @table capsule
 
 
 --https://blogs.msdn.microsoft.com/rezanour/2011/08/07/barycentric-coordinates-and-point-in-triangle-tests/
@@ -282,6 +285,10 @@ function intersect.ray_plane(ray, plane)
 	return ray.position + ray.direction * t, t
 end
 
+--- check if a ray intersects a capsule
+-- @tparam table ray @{ray}
+-- @tparam table capsule @{capsule}
+-- @treturn bool
 function intersect.ray_capsule(ray, capsule)
 	local dist2, p1, p2 = intersect.closest_point_segment_segment(
 		ray.position,
@@ -517,6 +524,7 @@ end
 --- check if an aabb and frustrum intersect
 -- @tparam table aabb @{aabb}
 -- @tparam table frustrum @{frustrum}
+-- @treturn bool
 function intersect.aabb_frustum(aabb, frustum)
 	-- Indexed for the 'index trick' later
 	local box = {
@@ -567,6 +575,11 @@ end
 -- outer.max is a vec3
 -- inner.min is a vec3
 -- inner.max is a vec3
+
+---check if an aabb encapsulates (contains fully) another aabb
+--@tparam table outer an @{aabb}, the outside aabb
+--@tparam table inner an @{aabb}, the inner contained aabb
+--@treturn bool
 function intersect.encapsulate_aabb(outer, inner)
 	return
 		outer.min.x <= inner.min.x and
@@ -577,20 +590,20 @@ function intersect.encapsulate_aabb(outer, inner)
 		outer.max.z >= inner.max.z
 end
 
--- a.position is a vec3
--- a.radius   is a number
--- b.position is a vec3
--- b.radius   is a number
-function intersect.circle_circle(a, b)
-	return intersect.circle_circle(a, b)
+--- check if two spheres intersect
+-- @tparam table a @{sphere}
+-- @tparam table b @{sphere}
+-- @treturn bool
+function intersect.sphere_sphere(a, b)
+	return a.position:dist(b.position) <= a.radius + b.radius
 end
 
 -- http://realtimecollisiondetection.net/blog/?p=103
--- sphere.position is a vec3
--- sphere.radius   is a number
--- triangle[1]     is a vec3
--- triangle[2]     is a vec3
--- triangle[3]     is a vec3
+
+--- check if a sphere and a triangle intersect
+-- @tparam table sphere @{sphere}
+-- @tparam table triangle @{triangle}
+-- @treturn bool
 function intersect.sphere_triangle(sphere, triangle)
 	-- Sphere is centered at origin
 	local A  = triangle[1] - sphere.position
@@ -655,6 +668,11 @@ end
 -- frustum.top     is a plane { a, b, c, d }
 -- frustum.near    is a plane { a, b, c, d }
 -- frustum.far     is a plane { a, b, c, d }
+
+--- check if a sphere intersects with a frustrum
+-- @tparam table sphere @{frustrum}
+-- @tparam table frustrum @{frustrum}
+-- @treturn bool
 function intersect.sphere_frustum(sphere, frustum)
 	local x, y, z = sphere.position:unpack()
 	local planes  = {
@@ -683,6 +701,10 @@ function intersect.sphere_frustum(sphere, frustum)
 	return dot + sphere.radius
 end
 
+--- check if two capsules intersect
+-- @tparam table c1 capsule
+-- @tparam table c2 capsule
+-- @treturn bool
 function intersect.capsule_capsule(c1, c2)
 	local dist2, p1, p2 = intersect.closest_point_segment_segment(c1.a, c1.b, c2.a, c2.b)
 	local radius = c1.radius + c2.radius
@@ -694,6 +716,7 @@ function intersect.capsule_capsule(c1, c2)
 	return false
 end
 
+--not documenting this because this already exists, unclear why this is present.
 function intersect.closest_point_segment_segment(p1, p2, p3, p4)
 	local s  -- Distance of intersection along segment 1
 	local t  -- Distance of intersection along segment 2
