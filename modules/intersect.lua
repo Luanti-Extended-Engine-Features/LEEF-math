@@ -14,7 +14,7 @@ local min         = math.min
 local max         = math.max
 local intersect   = {}
 
---- A frustrum
+--- A frustum
 -- where `a`, `b`, `c` and `d` are vec3s
 -- @field left plane `{a, b, c, d}`
 -- @field right plane `{a, b, c, d}`
@@ -22,7 +22,7 @@ local intersect   = {}
 -- @field top plane `{a, b, c, d}`
 -- @field near plane `{a, b, c, d}`
 -- @field far plane `{a, b, c, d}` (optional)
--- @table frustrum
+-- @table frustum
 
 --- An infinite ray
 -- @field direction (**vec3**)
@@ -105,9 +105,9 @@ function intersect.point_aabb(point, aabb)
 		aabb.max.z >= point.z
 end
 
---- check if a point intersects with a frustrum
+--- check if a point intersects with a frustum
 -- @tparam vec3 point
--- @tparam table frustrum a @{frustrum}
+-- @tparam table frustum a @{frustum}
 -- @treturn bool
 function intersect.point_frustum(point, frustum)
 	local x, y, z = point:unpack()
@@ -521,9 +521,9 @@ end
 -- frustum.near   is a plane { a, b, c, d }
 -- frustum.far    is a plane { a, b, c, d }
 
---- check if an aabb and frustrum intersect
+--- check if an aabb and frustum intersect
 -- @tparam table aabb @{aabb}
--- @tparam table frustrum @{frustrum}
+-- @tparam table frustum @{frustum}
 -- @treturn bool
 function intersect.aabb_frustum(aabb, frustum)
 	-- Indexed for the 'index trick' later
@@ -669,9 +669,9 @@ end
 -- frustum.near    is a plane { a, b, c, d }
 -- frustum.far     is a plane { a, b, c, d }
 
---- check if a sphere intersects with a frustrum
--- @tparam table sphere @{frustrum}
--- @tparam table frustrum @{frustrum}
+--- check if a sphere intersects with a frustum
+-- @tparam table sphere @{frustum}
+-- @tparam table frustum @{frustum}
 -- @treturn bool
 function intersect.sphere_frustum(sphere, frustum)
 	local x, y, z = sphere.position:unpack()

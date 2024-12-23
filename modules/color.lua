@@ -99,10 +99,7 @@ local function color_to_hsv(c)
 end
 
 --- The public constructor.
--- @param x Can be of three types: </br>
--- number red component 0-1
--- table {r, g, b, a}
--- nil for {0,0,0,0}
+-- @param r (**_nil_** | **_float_** | **_table_**) can be a table `{r,g,b,a}`, nil for `{0,0,0,0}` or `r` in rgba.
 -- @tparam number g Green component 0-1
 -- @tparam number b Blue component 0-1
 -- @tparam number a Alpha component 0-1
@@ -161,16 +158,16 @@ function color.from_hsva(h, s, v, a)
 end
 
 --- Invert a color.
--- @tparam color to invert
--- @treturn color out
+-- @tparam color c color to invert
+-- @treturn color
 function color.invert(c)
 	return new(1 - c[1], 1 - c[2], 1 - c[3], c[4])
 end
 
 --- Lighten a color by a component-wise fixed amount (alpha unchanged)
--- @tparam color to lighten
--- @tparam number amount to increase each component by, 0-1 scale
--- @treturn color out
+-- @tparam color c to lighten
+-- @tparam float v amount to increase each component by, 0-1 scale
+-- @treturn color
 function color.lighten(c, v)
 	return new(
 		utils.clamp(c[1] + v, 0, 1),
@@ -181,37 +178,37 @@ function color.lighten(c, v)
 end
 
 --- Interpolate between two colors.
--- @tparam color at start
--- @tparam color at end
--- @tparam number s in 0-1 progress between the two colors
+-- @tparam color a at start
+-- @tparam color b at end
+-- @tparam float s in 0-1 progress between the two colors
 -- @treturn color out
 function color.lerp(a, b, s)
 	return a + s * (b - a)
 end
 
 --- Unpack a color into individual components in 0-1.
--- @tparam color to unpack
--- @treturn number r in 0-1
--- @treturn number g in 0-1
--- @treturn number b in 0-1
--- @treturn number a in 0-1
+-- @tparam color c to unpack
+-- @treturn float r in 0-1
+-- @treturn float g in 0-1
+-- @treturn float b in 0-1
+-- @treturn float a in 0-1
 function color.unpack(c)
 	return c[1], c[2], c[3], c[4]
 end
 
 --- Unpack a color into individual components in 0-255.
--- @tparam color to unpack
--- @treturn number r in 0-255
--- @treturn number g in 0-255
--- @treturn number b in 0-255
--- @treturn number a in 0-255
+-- @tparam color c to unpack
+-- @treturn int r in 0-255
+-- @treturn int g in 0-255
+-- @treturn int b in 0-255
+-- @treturn int a in 0-255
 function color.as_255(c)
 	return c[1] * 255, c[2] * 255, c[3] * 255, c[4] * 255
 end
 
 --- Darken a color by a component-wise fixed amount (alpha unchanged)
--- @tparam color to darken
--- @tparam number amount to decrease each component by, 0-1 scale
+-- @tparam color c to darken
+-- @tparam int v amount to decrease each component by, 0-1 scale
 -- @treturn color out
 function color.darken(c, v)
 	return new(
@@ -223,8 +220,8 @@ function color.darken(c, v)
 end
 
 --- Multiply a color's components by a value (alpha unchanged)
--- @tparam color to multiply
--- @tparam number to multiply each component by
+-- @tparam color c to multiply
+-- @tparam number v to multiply each component by
 -- @treturn color out
 function color.multiply(c, v)
 	local t = color.new()
@@ -236,9 +233,9 @@ function color.multiply(c, v)
 	return t
 end
 
--- directly set alpha channel
--- @tparam color to alter
--- @tparam number new alpha 0-1
+--- directly set alpha channel
+-- @tparam color c to alter
+-- @tparam float v new alpha 0-1
 -- @treturn color out
 function color.alpha(c, v)
 	local t = color.new()
@@ -251,8 +248,8 @@ function color.alpha(c, v)
 end
 
 --- Multiply a color's alpha by a value
--- @tparam color to multiply
--- @tparam number to multiply alpha by
+-- @tparam color c to multiply
+-- @tparam float v to multiply alpha by
 -- @treturn color out
 function color.opacity(c, v)
 	local t = color.new()
@@ -265,8 +262,8 @@ function color.opacity(c, v)
 end
 
 --- Set a color's hue (saturation, value, alpha unchanged)
--- @tparam color to alter
--- @tparam hue to set 0-1
+-- @tparam color col to alter
+-- @tparam float hue to set 0-1
 -- @treturn color out
 function color.hue(col, hue)
 	local c = color_to_hsv(col)
@@ -275,8 +272,8 @@ function color.hue(col, hue)
 end
 
 --- Set a color's saturation (hue, value, alpha unchanged)
--- @tparam color to alter
--- @tparam saturation to set 0-1
+-- @tparam color col to alter
+-- @tparam float percent to set 0-1
 -- @treturn color out
 function color.saturation(col, percent)
 	local c = color_to_hsv(col)
@@ -285,8 +282,8 @@ function color.saturation(col, percent)
 end
 
 --- Set a color's value (saturation, hue, alpha unchanged)
--- @tparam color to alter
--- @tparam value to set 0-1
+-- @tparam color col to alter
+-- @tparam float percent to set 0-1
 -- @treturn color out
 function color.value(col, percent)
 	local c = color_to_hsv(col)
@@ -294,7 +291,17 @@ function color.value(col, percent)
 	return hsv_to_color(c)
 end
 
+
+--- convert gamma to linear.
 -- https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
+--@tparam float r 0-1
+--@tparam float g 0-1
+--@tparam float b 0-1
+--@tparam float a 0-1 (optional)
+--@treturn float r 0-1
+--@treturn float g 0-1
+--@treturn float b 0-1
+--@treturn float a 0-1
 function color.gamma_to_linear(r, g, b, a)
 	local function convert(c)
 		if c > 1.0 then
@@ -321,7 +328,17 @@ function color.gamma_to_linear(r, g, b, a)
 	end
 end
 
+
+--- convert linear to gamma.
 -- https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
+--@tparam float r 0-1
+--@tparam float g 0-1
+--@tparam float b 0-1
+--@tparam float a 0-1 (optional)
+--@treturn float r 0-1
+--@treturn float g 0-1
+--@treturn float b 0-1
+--@treturn float a 0-1
 function color.linear_to_gamma(r, g, b, a)
 	local function convert(c)
 		if c > 1.0 then
@@ -349,7 +366,7 @@ function color.linear_to_gamma(r, g, b, a)
 end
 
 --- Check if color is valid
--- @tparam color to test
+-- @tparam color a to test
 -- @treturn boolean is color
 function color.is_color(a)
 	if type(a) ~= "table" then
