@@ -64,7 +64,7 @@ end
 
 --- Extend bound to include point
 -- @tparam bound3 a bound
--- @tparam vec3 point to include
+-- @tparam vec3 center point to include
 -- @treturn bound3 Bound covering current min, current max and new point
 function bound3.extend(a, center)
 	return bound3.new(a.min:component_min(center), a.max:component_max(center))
@@ -72,7 +72,7 @@ end
 
 --- Extend bound to entirety of other bound
 -- @tparam bound3 a bound
--- @tparam bound3 bound to cover
+-- @tparam bound3 b bound to cover
 -- @treturn bound3 Bound covering current min and max of each bound in the pair
 function bound3.extend_bound(a, b)
 	return a:extend(b.min):extend(b.max)
@@ -87,7 +87,7 @@ end
 
 --- Resize bounding box from minimum corner
 -- @tparam bound3 a bound
--- @tparam vec3 new size
+-- @tparam vec3 size new size
 -- @treturn bound3 resized bound
 function bound3.with_size(a, size)
 	return bound3.new(a.min, a.min + size)
@@ -109,7 +109,7 @@ end
 
 --- Move bounding box to new center
 -- @tparam bound3 a bound
--- @tparam vec3 new center
+-- @tparam vec3 center center
 -- @treturn bound3 Bound with same size as input but different center
 function bound3.with_center(a, center)
 	return bound3.offset(a, center - a:center())
@@ -117,7 +117,7 @@ end
 
 --- Resize bounding box from center
 -- @tparam bound3 a bound
--- @tparam vec3 new size
+-- @tparam vec3 size new size
 -- @treturn bound3 resized bound
 function bound3.with_size_centered(a, size)
 	local center = a:center()
@@ -137,7 +137,7 @@ end
 
 --- Shrink bounding box with fixed margin
 -- @tparam bound3 a bound
--- @tparam vec3 a margin
+-- @tparam vec3 v margin
 -- @treturn bound3 bound with margin subtracted from all edges. May not be valid, consider calling check()
 function bound3.inset(a, v)
 	return bound3.new(a.min + v, a.max - v)
@@ -145,7 +145,7 @@ end
 
 --- Expand bounding box with fixed margin
 -- @tparam bound3 a bound
--- @tparam vec3 a margin
+-- @tparam vec3 v margin
 -- @treturn bound3 bound with margin added to all edges. May not be valid, consider calling check()
 function bound3.outset(a, v)
 	return bound3.new(a.min - v, a.max + v)
@@ -153,7 +153,7 @@ end
 
 --- Offset bounding box
 -- @tparam bound3 a bound
--- @tparam vec3 offset
+-- @tparam vec3 v offset
 -- @treturn bound3 bound with same size, but position moved by offset
 function bound3.offset(a, v)
 	return bound3.new(a.min + v, a.max + v)
@@ -161,7 +161,7 @@ end
 
 --- Test if point in bound
 -- @tparam bound3 a bound
--- @tparam vec3 point to test
+-- @tparam vec3 v point to test
 -- @treturn boolean true if point in bounding box
 function bound3.contains(a, v)
 	return a.min.x <= v.x and a.min.y <= v.y and a.min.z <= v.z
@@ -170,7 +170,7 @@ end
 
 -- Round all components of all vectors to nearest int (or other precision).
 -- @tparam vec3 a bound to round.
--- @tparam precision Digits after the decimal (round number if unspecified)
+-- @tparam int precision Digits after the decimal (round number if unspecified)
 -- @treturn vec3 Rounded bound
 function bound3.round(a, precision)
 	return bound3.new(a.min:round(precision), a.max:round(precision))

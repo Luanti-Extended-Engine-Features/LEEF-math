@@ -213,7 +213,7 @@ end
 
 --- Get the sign of a number
 -- returns 1 for positive values, -1 for negative and 0 for zero.
--- @param value
+-- @param n value
 -- @return number
 function utils.sign(n)
 	if n > 0 then
