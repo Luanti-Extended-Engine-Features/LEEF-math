@@ -28,10 +28,8 @@ end
 bound2.zero = new(vec2.zero, vec2.zero)
 
 --- The public constructor.
--- @param min Can be of two types: </br>
--- vec2 min, minimum value for each component
--- nil Create bound at single point 0,0
--- @tparam vec2 max, maximum value for each component
+-- @param min (**_vec2_** | **_nil_**) minimum value for each component. `nil` sets to zero.
+-- @tparam vec2 max maximum value for each component
 -- @treturn bound2 out
 function bound2.new(min, max)
 	if min and max then
@@ -63,53 +61,53 @@ function bound2.at(a, b) -- "bounded by". b may be nil
 end
 
 --- Extend bound to include point
--- @tparam bound2 a bound
--- @tparam vec2 point to include
+-- @tparam bound2 a a bound
+-- @tparam vec2 center point to include
 -- @treturn bound2 Bound covering current min, current max and new point
 function bound2.extend(a, center)
 	return bound2.new(a.min:component_min(center), a.max:component_max(center))
 end
 
 --- Extend bound to entirety of other bound
--- @tparam bound2 a bound
--- @tparam bound2 bound to cover
+-- @tparam bound2 a a bound
+-- @tparam bound2 b bound to cover
 -- @treturn bound2 Bound covering current min and max of each bound in the pair
 function bound2.extend_bound(a, b)
 	return a:extend(b.min):extend(b.max)
 end
 
 --- Get size of bounding box as a vector
--- @tparam bound2 a bound
+-- @tparam bound2 a a bound
 -- @treturn vec2 Vector spanning min to max points
 function bound2.size(a)
 	return a.max - a.min
 end
 
 --- Resize bounding box from minimum corner
--- @tparam bound2 a bound
--- @tparam vec2 new size
+-- @tparam bound2 a a bound
+-- @tparam vec2 size new size
 -- @treturn bound2 resized bound
 function bound2.with_size(a, size)
 	return bound2.new(a.min, a.min + size)
 end
 
 --- Get half-size of bounding box as a vector. A more correct term for this is probably "apothem"
--- @tparam bound2 a bound
+-- @tparam bound2 a a bound
 -- @treturn vec2 Vector spanning center to max point
 function bound2.radius(a)
 	return a:size()/2
 end
 
 --- Get center of bounding box
--- @tparam bound2 a bound
+-- @tparam bound2 a a bound
 -- @treturn bound2 Point in center of bound
 function bound2.center(a)
 	return (a.min + a.max)/2
 end
 
 --- Move bounding box to new center
--- @tparam bound2 a bound
--- @tparam vec2 new center
+-- @tparam bound2 a a bound
+-- @tparam vec2 center new center
 -- @treturn bound2 Bound with same size as input but different center
 function bound2.with_center(a, center)
 	return bound2.offset(a, center - a:center())
@@ -117,7 +115,7 @@ end
 
 --- Resize bounding box from center
 -- @tparam bound2 a bound
--- @tparam vec2 new size
+-- @tparam vec2 size new size
 -- @treturn bound2 resized bound
 function bound2.with_size_centered(a, size)
 	local center = a:center()
@@ -137,7 +135,7 @@ end
 
 --- Shrink bounding box with fixed margin
 -- @tparam bound2 a bound
--- @tparam vec2 a margin
+-- @tparam vec2 v margin
 -- @treturn bound2 bound with margin subtracted from all edges. May not be valid, consider calling check()
 function bound2.inset(a, v)
 	return bound2.new(a.min + v, a.max - v)
@@ -145,7 +143,7 @@ end
 
 --- Expand bounding box with fixed margin
 -- @tparam bound2 a bound
--- @tparam vec2 a margin
+-- @tparam vec2 v margin
 -- @treturn bound2 bound with margin added to all edges. May not be valid, consider calling check()
 function bound2.outset(a, v)
 	return bound2.new(a.min - v, a.max + v)
@@ -153,7 +151,7 @@ end
 
 --- Offset bounding box
 -- @tparam bound2 a bound
--- @tparam vec2 offset
+-- @tparam vec2 v offset
 -- @treturn bound2 bound with same size, but position moved by offset
 function bound2.offset(a, v)
 	return bound2.new(a.min + v, a.max + v)
@@ -161,7 +159,7 @@ end
 
 --- Test if point in bound
 -- @tparam bound2 a bound
--- @tparam vec2 point to test
+-- @tparam vec2 v point to test
 -- @treturn boolean true if point in bounding box
 function bound2.contains(a, v)
 	return a.min.x <= v.x and a.min.y <= v.y
