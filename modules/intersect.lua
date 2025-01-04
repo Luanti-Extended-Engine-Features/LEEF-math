@@ -61,7 +61,7 @@ local intersect   = {}
 --- Check if a point intersects with a triangle
 -- @tparam vec3 point
 -- @tparam table triangle a @{triangle}
--- @treturn bool
+-- @return (**_false_** | **_float_**) false if does not intersect and true if it does
 function intersect.point_triangle(point, triangle)
 	local u = triangle[2] - triangle[1]
 	local v = triangle[3] - triangle[1]
@@ -95,6 +95,7 @@ end
 --- check if a point is inside an Axis Aligned Bounding Box
 -- @tparam vec3 point
 -- @tparam table aabb @{aabb}
+-- @treturn bool
 function intersect.point_aabb(point, aabb)
 	return
 		aabb.min.x <= point.x and
@@ -142,7 +143,8 @@ end
 -- @tparam table ray @{ray}
 -- @tparam table triangle @{triangle}
 -- @tparam bool backface_cull (optional) wether backface culling is enabled
--- @treturn bool
+-- @return (**_false_** | **_Vec3_**) false if does not intersect, intersection point if true
+-- @return (**_nil_** | **_float_**) distance from ray origin
 function intersect.ray_triangle(ray, triangle, backface_cull)
 	local e1 = triangle[2] - triangle[1]
 	local e2 = triangle[3] - triangle[1]
@@ -194,7 +196,8 @@ end
 --- check if a ray and a sphere intersect
 -- @tparam table ray a @{ray}
 -- @tparam table sphere a @{sphere}
--- @treturn bool
+-- @return (**_false_** | **_Vec3_**) false if does not intersect, intersection point if true
+-- @return (**_nil_** | **_float_**) distance from ray origin
 function intersect.ray_sphere(ray, sphere)
 	local offset = ray.position - sphere.position
 	local b = offset:dot(ray.direction)
@@ -226,7 +229,8 @@ end
 --- check if a ray and an aabb
 -- @tparam table ray @{ray}
 -- @tparam table aabb @{aabb}
--- @treturn bool
+-- @return (**_false_** | **_Vec3_**) false if does not intersect, intersection point if true
+-- @return (**_nil_** | **_float_**) distance from ray origin
 function intersect.ray_aabb(ray, aabb)
 	local dir     = ray.direction:normalize()
 	local dirfrac = vec3(
@@ -264,7 +268,8 @@ end
 --- check if a ray and a plane intersect
 -- @tparam table ray @{ray}
 -- @tparam table plane @{plane}
--- @treturn bool
+-- @return (**_false_** | **_Vec3_**) false if does not intersect, intersection point if true
+-- @return (**_nil_** | **_float_**) distance from ray origin
 function intersect.ray_plane(ray, plane)
 	local denom = plane.normal:dot(ray.direction)
 
@@ -288,7 +293,7 @@ end
 --- check if a ray intersects a capsule
 -- @tparam table ray @{ray}
 -- @tparam table capsule @{capsule}
--- @treturn bool
+-- @return (**_false_** | **_Vec3_**) closest point on line to ray
 function intersect.ray_capsule(ray, capsule)
 	local dist2, p1, p2 = intersect.closest_point_segment_segment(
 		ray.position,
@@ -672,7 +677,7 @@ end
 --- check if a sphere intersects with a frustum
 -- @tparam table sphere @{frustum}
 -- @tparam table frustum @{frustum}
--- @treturn bool
+-- @return (**_false_** | **_float_**) distance from the nearplane
 function intersect.sphere_frustum(sphere, frustum)
 	local x, y, z = sphere.position:unpack()
 	local planes  = {
@@ -704,7 +709,8 @@ end
 --- check if two capsules intersect
 -- @tparam table c1 capsule
 -- @tparam table c2 capsule
--- @treturn bool
+-- @return (**_false_** | **_Vec3_**) false if no intersections, vec3 on the first capsule's line if intersection occours
+-- @treturn (**_nil_** | **_Vec3_**)  second line intersect
 function intersect.capsule_capsule(c1, c2)
 	local dist2, p1, p2 = intersect.closest_point_segment_segment(c1.a, c1.b, c2.a, c2.b)
 	local radius = c1.radius + c2.radius
