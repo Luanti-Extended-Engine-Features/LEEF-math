@@ -9,6 +9,7 @@ local utils     = require(modules .. "utils")
 local precond   = require(modules .. "_private_precond")
 local private   = require(modules .. "_private_utils")
 local DBL_EPSILON = constants.DBL_EPSILON
+local FLT_EPSILON = constants.FLT_EPSILON
 local sqrt      = math.sqrt
 local cos       = math.cos
 local sin       = math.sin
@@ -337,16 +338,19 @@ mat4.set_rot_luanti_entity = mat4.set_rot_zxy
 -- @treturn float yaw
 -- @treturn float roll
 function mat4.get_rot_zxy(m)
+	--https://www.wolframalpha.com/input?i2d=true&i=%7B%7Bcos%5C%2840%29y%5C%2841%29%2C0%2Csin%5C%2840%29y%5C%2841%29%7D%2C%7B0%2C1%2C0%7D%2C%7B-sin%5C%2840%29y%5C%2841%29%2C0%2Ccos%5C%2840%29y%5C%2841%29%7D%7D%7B%7B1%2C0%2C0%7D%2C%7B0%2Ccos%5C%2840%29x%5C%2841%29%2C-sin%5C%2840%29x%5C%2841%29%7D%2C%7B0%2Csin%5C%2840%29x%5C%2841%29%2Ccos%5C%2840%29x%5C%2841%29%7D%7D%7B%7Bcos%5C%2840%29z%5C%2841%29%2C-sin%5C%2840%29z%5C%2841%29%2C0%7D%2C%7Bsin%5C%2840%29z%5C%2841%29%2Ccos%5C%2840%29z%5C%2841%29%2C0%7D%2C%7B0%2C0%2C1%7D%7D
 	local X,Y,Z
-	if abs(m[10])-1 < DBL_EPSILON then --check if x is 90 or -90. If it is yaw will experience gimbal lock and there will therefore be infinite solutions.
+	local ly = math.sqrt(m[9]^2+m[10]^2+m[11]^2) --account for rounding errors that can be generated when getting the inverse
+	if 1-abs(m[10]/ly) > FLT_EPSILON then --check if x is 90 or -90. If it is yaw will experience gimbal lock and there will therefore be infinite solutions.
 		Z = atan2(m[2], m[6]) --(cz*cx / sz*cx) = cz/cx = tz.
 		Y = atan2(m[9], m[11])
 		X = atan2(-m[10], m[6]/cos(Z))
 	else
-		Z = atan2(m[7], m[5])
-		Y = 0 --pitch and roll are the same given x=90 or -90.
-		X = asin(-m[10])
+		Z = 0 --yaw and roll do the same thing, since we need yaw to solve for x in this case, grab it instead
+		Y = atan2(m[3], m[1])
+		X = atan2(-m[10], 0)		--can't use asin because of possible NaN vals
 	end
+	print(m[10], ly, 1-abs(m[10]/ly), FLT_EPSILON, 1-abs(m[10]/ly) < FLT_EPSILON)
 	return X,Y,Z
 end
 
@@ -406,14 +410,14 @@ mat4.set_rot_irrlicht_bone = mat4.set_rot_xyz
 -- @treturn float roll
 function mat4.get_rot_xyz(m)
 	local X,Y,Z
-	if abs(m[3])-1 < DBL_EPSILON then --check if x is 90 or -90. If they are yaw will experience gimbal lock and there will therefore be infinite solutions.
+	local lx = math.sqrt(m[1]^2+m[2]^2+m[3]^2) --account for rounding errors that can be generated when getting the inverse
+	if abs(m[3]/lx)-1 < DBL_EPSILON then --check if x is 90 or -90. If they are yaw will experience gimbal lock and there will therefore be infinite solutions.
 		Z = atan2(m[2], m[1])
 		Y = atan2(-m[3], m[1]/cos(Z))
 		X = atan2(m[7], m[11])
 	else
-		--Z = atan2(M[], M[])
-		Y = asin(m[3])
-		X = atan2(m[5], m[7])
+		Y = atan2(-m[9], 0)
+		X = atan2(m[6], m[4]) --measure y basis vector's angle
 		Z = 0
 	end
 	return X,Y,Z
@@ -427,8 +431,31 @@ end
 -- @function get_rot_irrlicht_bone
 mat4.get_rot_irrlicht_bone = mat4.get_rot_xyz
 
-
-
+--- Normalize the columns of a matrix. Use this to help with rounding errors.
+-- @tparam mat4 m
+function mat4.normalize_columns(m)
+	local x = (m[1]+m[2]+m[3]+m[4])
+	m[1] = m[1]/x
+	m[2] = m[2]/x
+	m[3] = m[3]/x
+	m[4] = m[4]/x
+	local y = 1/(m[5]+m[6]+m[7]+m[8])
+	m[5] = m[5]/y
+	m[6] = m[6]/y
+	m[7] = m[7]/y
+	m[8] = m[8]/y
+	local z = 1/(m[9]+m[10]+m[11]+m[12])
+	m[9] = m[9]/z
+	m[10] = m[10]/z
+	m[11] = m[11]/z
+	m[12] = m[12]/z
+	local w = 1/(m[13]+m[14]+m[15]+m[16])
+	m[13] = m[13]/w
+	m[14] = m[14]/w
+	m[15] = m[15]/w
+	m[16] = m[16]/w
+	return m
+end
 
 
 
@@ -917,7 +944,6 @@ end
 	z = math.atan2(a[2], a[1])
 	return x, y, z
 end]]
-
 
 --- Project a point into screen space
 -- @tparam vec3 obj Object position in world space
