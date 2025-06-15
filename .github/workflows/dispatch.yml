@@ -6,7 +6,10 @@ on:
 jobs:
   update_repo:
     runs_on: ubuntu-latest
-    run: |
-      curl -XPOST -u "${{Luanti-Extended-Engine-Features}}:${{secrets.DISPATCH_PAT}}"
-      -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json"
-      https://api.github.com/repos/Luanti-Extended-Engine-Features/documentation/dispatches --data '{"event_type": "build_docs"}'
+    steps:
+
+    - name:
+      run: |
+        curl -XPOST -u "${{Luanti-Extended-Engine-Features}}:${{secrets.DISPATCH_PAT}}"
+        -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json"
+        https://api.github.com/repos/Luanti-Extended-Engine-Features/documentation/dispatches --data '{"event_type": "build_docs"}'
